@@ -1,0 +1,173 @@
+# Jared Adam
+# started 1/18/2024
+
+# three years of ce2 micros in corn
+    # 2021, 2022, and 2023
+ # two years of corn and bean micros 
+    # 2022 and 2023
+# two timings for each
+
+# packages ####
+library(tidyverse)
+library(vegan)
+library(lme4)
+library(performance)
+library(lmtest)
+library(MASS)
+
+# data ####
+micros <- CE2_counts
+micros
+
+# cleaning ####
+colnames(micros)
+unique(micros$date)
+
+?distinct
+# eliminating the duplicated rows
+micros_ready <- micros %>% 
+  mutate_at(vars(4:41), as.numeric) %>% 
+  group_by(date, crop, plot) %>% 
+  distinct(date, .keep_all = TRUE) %>% 
+  ungroup() %>% 
+  print(n = Inf)
+
+# need to add treatment in now
+micros_set <- micros_ready %>% 
+  mutate(plot = replace(plot, plot == 507, 502)) %>% # there is a sneaky 507 plot number
+  mutate(trt = case_when(plot %in% c(101,203,304,401,503) ~ 'Check',
+                         plot %in% c(102,201,303,402,502) ~ 'Green',
+                         plot %in% c(103,204,302,403,501) ~ 'Brown',
+                         plot %in% c(104,202,301,404,504) ~ 'Gr-Br')) %>% 
+  mutate_at(vars(1:3), as.factor) %>% 
+  mutate_at(vars(43), as.factor) %>% 
+  print(n = Inf)
+# check to make sure these changes worked
+colnames(micros_set)
+unique(micros_set$trt)
+unique(micros_set$plot)
+which(micros_set$trt == 'NA')
+which(micros_set$trt == 'Green')
+class(micros_set$trt)
+
+# scores ####
+micros_set
+colnames(micros_set)
+#1. aggregate columns
+  # e.g., mites into one column 
+
+aggregate_micros <- micros_set %>% 
+  mutate(mites = Orb + Norb,
+          hemiptera = hemip + Enich + Coccomorpha,
+          adult = a_dipt + lep + sipoopter, 
+          coleop_1 = AC + OAC) %>% 
+  dplyr::select(-Orb, -Norb, -hemip, -Enich, -pod, -ento, -sym, -AC, -OAC, 
+                -a_dipt, -Coccomorpha, -lep, -sipoopter) %>% 
+  rename(dip_5 = 'Dip>5',
+         dip_20 = 'Dip<5',
+         chil_10 = 'Chil>5',
+         chil_20 = 'Chil<5',
+         zygentoma = archaeognatha) %>% 
+  rename_with(tolower)
+colnames(aggregate_micros)
+
+micro_scores <- aggregate_micros %>% 
+  mutate(mite_score = if_else(mites >= 1, 20, 0),
+         pro_score = if_else(protura >= 1, 20,0),
+         dip_score = if_else(diplura >= 1, 20, 0),
+         hemip_score = if_else(hemiptera >= 1, 1, 0), #1 unless cicada larvae 
+         thrips_score = if_else(thrips >= 1, 1, 0),
+         coleop_score = if_else(coleop_1 >= 1, 1, 0),
+         hymen_score = if_else(hymen >= 1, 1, 0),
+         formic_score = if_else(formicid >= 1, 5, 0), 
+         beetle_larv__score = if_else(cl >= 1, 10, 0),
+         other_fly_larv_score = if_else(ol >= 1, 10, 0),
+         spider_score = if_else(spider >= 1, 5, 0),
+         pseudo_score = if_else(pseu >= 1, 20, 0), 
+         isop_score = if_else(iso >= 1, 10, 0), 
+         chil_10_score = if_else(chil_10 >= 1, 10, 0),
+         chil_20_score = if_else(chil_20 >= 1, 20, 0),
+         diplo_20_score = if_else(dip_20 >= 1, 20, 0),
+         diplo_5_score = if_else(dip_5 >= 1, 5, 0),
+         symph_score = if_else(simphyla >= 1, 20, 0), 
+         col_20_score = if_else(col_20 >= 1, 20, 0),
+         col_10_score = if_else(col_10 >= 1, 10, 0), 
+         col_6_score = if_else(col_6 >= 1, 6, 0),
+         col_4_score = if_else(col_4 >= 1, 4, 0),
+         adult_score = if_else(adult >= 1, 1, 0),
+         psocop_score = if_else(psocodea >= 1, 1, 0),
+         pauropod_score = if_else(pauropoda >= 1, 20, 0),
+         dermaptera_score = if_else(dermaptera >= 1, 1, 0),
+         zygentoma_score = if_else(zygentoma >= 1, 10, 0)) %>% 
+   dplyr::select(-mites, -protura, -diplura, -hemiptera, -thrips, -coleop_1, -hymen,
+          -formicid, -cl, -ol, -spider, -pseu, -iso, -chil_10, -chil_20,-dip_20,-dip_5, -simphyla,
+          -col_20, -col_10, -col_6, -col_4, -adult, -pauropoda, -annelid, -psocodea, -dermaptera,
+          -zygentoma)
+colnames(micro_scores)
+
+### 
+##
+#
+
+mean_scores <- micro_scores %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_score = dplyr::select(.,5:33) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  mutate(block = case_when(plot %in% c(101,102,103,104) ~ 1,
+                              plot %in% c(201,202,203,204) ~ 2, 
+                              plot %in% c(301,302,303,304) ~ 3, 
+                              plot %in% c(401,402,403,404) ~ 4,
+                              plot %in% c(501,502,503,504) ~ 5)) %>% 
+  relocate(date, crop, plot, trt, block) %>% 
+  mutate(block = as.factor(block)) %>% 
+  dplyr::group_by(date, trt) %>% 
+  dplyr::summarize(avg = mean(total_score), 
+                   sd = std.error(total_score)) %>% #plyr has summarize
+  print(n = Inf)
+colnames(mean_scores)
+unique(mean_scores$date)
+
+ggplot(mean_scores, aes(x = trt, y = avg, fill = date))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  facet_wrap(~date)
+
+# 2021
+micros_21 <- filter(mean_scores, date %in% c("9/1/2021", "7/1/2021"))
+
+ggplot(micros_21, aes(x = trt, y = avg, fill = date))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  facet_wrap(~date)+
+  ggtitle("2021")+
+  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+                 colour="orange", alpha=0.9, size=1.3)
+
+# 2022
+micros_22 <- filter(mean_scores, date %in% c('6/22/2022', '9/23/2022'))
+
+ggplot(micros_22, aes(x = trt, y = avg, fill = date))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  facet_wrap(~date)+
+  ggtitle("2022")+
+  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+                 colour="orange", alpha=0.9, size=1.3)
+
+# 2023
+micros_23 <- filter(mean_scores, date %in% c('7/18/2023','11/4/2023'))
+
+ggplot(micros_23, aes(x = trt, y = avg, fill = date))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  facet_wrap(~date)+
+  ggtitle("2023")+
+  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+                 colour="orange", alpha=0.9, size=1.3)
+
+#
+##
+###
+
+
+
+# permanova ####
+# need different values here
+# eliminate score columns 
+micros_set
