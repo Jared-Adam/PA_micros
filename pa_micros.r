@@ -21,6 +21,9 @@ micros
 
 cc <- PSA_PAcc_biomass
 cc
+
+yield <- PSA_PA_yield
+yield
 # cleaning ####
 colnames(micros)
 unique(micros$date)
@@ -169,6 +172,7 @@ ggplot(micros_23, aes(x = trt, y = avg, fill = date))+
 ##
 ###
 
+# CC biomass ####
 # cc biomass time 
 cc_clean <- cc %>% 
   mutate_at(vars(1:4), as.factor) %>% 
@@ -195,13 +199,19 @@ ggplot(filter(cc_clean, trt != 'check'), aes(x = cc_mean, y = trt, fill = trt))+
 #   mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
 #   mutate(year = format(date, "%Y")) %>% 
 #   relocate(year) %>% 
-#   select(-date) %>% 
+#   dplyr::select(-date) %>% 
 #   group_by(year, trt) %>% 
 #   summarise(year_mean = mean(avg))
 
 # the above code worked, but i think it was wrong 1/19/2024
 # # took the avg of an avg
 # #let's check this
+
+###
+##
+#
+
+# mirco scores x cc biomass ####
 
 colnames(test)
 corn_micros_yr <- micro_scores %>% 
@@ -218,20 +228,20 @@ corn_micros_yr <- micro_scores %>%
   mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
   mutate(year = format(date, "%Y")) %>% 
   relocate(year, total_score) %>% 
-  select(-date) %>% 
+  dplyr::select(-date) %>% 
   group_by(year, trt, crop) %>% 
   summarise(mean_score_yr = mean(total_score)) %>% 
   filter(crop == 'corn') %>% 
-  select(-crop) %>% 
+  dplyr::select(-crop) %>% 
   print(n = Inf)
 
 # cbind now
 new_micro_cc <- cbind(corn_micros_yr, cc_clean)
 new_micro_cc <- new_micro_cc %>% 
   rename(year = year...4) %>% 
-  select(-year...1) %>% 
+  dplyr::select(-year...1) %>% 
   rename(trt = trt...2) %>% 
-  select(-trt...5) %>% 
+  dplyr::select(-trt...5) %>% 
   relocate(year, trt)
 
 ggplot(filter(new_micro_cc, trt != 'Check'), aes(x = mean_score_yr, y = cc_mean, label = year))+
@@ -240,11 +250,123 @@ ggplot(filter(new_micro_cc, trt != 'Check'), aes(x = mean_score_yr, y = cc_mean,
   scale_color_manual(values = c('brown', 'tan', 'green'))+
   geom_text(vjust = -1, aes(fontface = 'bold'))+
   guides(shape = FALSE)+
-  labs(title = "Micros x CC biomass and year", 
+  labs(title = "Micro scores x CC biomass and year", 
        y = 'Average cc biomass (g)',
        x = 'Average micro scores')
 
+###
+##
+#
 
+# micro pops x cc biomass ####
+micros_set
+colnames(micros_set)
+unique(micros_set$crop)
+corn_micro_totals <- micros_set %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_abund = dplyr::select(.,5:43) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  dplyr::select(date, crop, plot, trt, total_abund) %>% 
+  filter(crop == 'corn') %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year) %>% 
+  dplyr::select(-date) %>% 
+  group_by(year, trt) %>% 
+  summarise(avg_abund = mean(total_abund))
+
+new_total_cc <- cbind(cc_clean, corn_micro_totals)
+new_total_cc <- new_total_cc %>% 
+  rename(year = year...1, 
+         trt = trt...7) %>% 
+  dplyr::select(-year...6, -trt...2)
+
+ggplot(filter(new_total_cc, trt != 'Check'), aes(x = avg_abund, y = cc_mean, label = year))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  geom_smooth(method = 'lm') + 
+  scale_color_manual(values = c('brown', 'tan', 'green'))+
+  geom_text(vjust = -1, aes(fontface = 'bold'))+
+  guides(shape = FALSE)+
+  labs(title = "Micro abundance x CC biomass and year", 
+       y = 'Average cc biomass (g)',
+       x = 'Average micro abundance')
+
+
+###
+##
+#
+
+# yield x micro pops ####
+yield
+colnames(yield)
+
+yield$plot <- gsub('-[0-9.]','', yield$plot) # remove - and all numbers following
+test_b <- filter(yield, trt == 'Brown' & year == '2021') %>% 
+  summarise(mean = mean(bu_ac))
+test_g <- filter(yield, trt == 'Green' & year == '2021') %>% 
+  summarise(mean = mean(bu_ac))
+
+yield_clean <- yield %>% 
+  dplyr::select(-block, -trt_num, -crop) %>% 
+  mutate(trt = as.factor(trt)) %>% 
+  mutate(year = as.factor(year)) %>%
+  group_by(year, trt) %>% 
+  summarise(lb_pass_mean = mean(lb_pass_moisture), 
+         lb_ac_mean = mean(lb_ac),
+         bu_ac_mean = mean(bu_ac)) %>% 
+  mutate(year = as.factor(year)) %>%
+  print(n = Inf)
+
+test_b <- filter(yield, trt == 'Brown' & year == '2021') %>% 
+  summarise(brown_mean = mean(bu_ac)) %>% 
+  print(n = Inf)
+test_g <- filter(yield, trt == 'Green' & year == '2021') %>% 
+  summarise(green_mean = mean(bu_ac))%>% 
+  print(n = Inf)
+
+# micros 
+corn_micro_totals
+
+new_yield_abundance <- cbind(corn_micro_totals, yield_clean)
+new_yield_abundance <- new_yield_abundance %>% 
+  rename(year = year...4, 
+         trt = trt...2) %>% 
+  dplyr::select(-year...1, - trt...5) %>% 
+  relocate(year, trt) %>% 
+  print( n = Inf)
+
+ggplot(filter(new_yield_abundance, trt != 'Check'), aes(x = bu_ac_mean, y = avg_abund, label = year))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  geom_smooth(method = 'lm') + 
+  scale_color_manual(values = c('brown', 'tan', 'green'))+
+  geom_text(vjust = -1, aes(fontface = 'bold'))+
+  guides(shape = FALSE)+
+  labs(title = "Micro abundance x yield and year", 
+       y = 'Average micro abundance',
+       x = 'Average bu/ac')
+
+# models
+# need different dfs
+micro_model_df <- micros_set %>%
+  filter(crop == 'corn') %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_abund = dplyr::select(.,5:43) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  dplyr::select(date, crop, plot, trt, total_abund) %>% 
+  print(n = Inf)
+
+#yield_model_df
+yield %>% 
+  
+
+
+
+# #ymp1 <- glmer.nb(bu_ac_mean ~ avg_abund + (1|year), 
+#              data = new_yield_abundance)
+
+###
+##
+#
 
 # permanova ####
 # need different values here
