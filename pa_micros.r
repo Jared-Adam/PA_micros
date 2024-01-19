@@ -19,6 +19,8 @@ library(MASS)
 micros <- CE2_counts
 micros
 
+cc <- PSA_PAcc_biomass
+cc
 # cleaning ####
 colnames(micros)
 unique(micros$date)
@@ -148,7 +150,7 @@ micros_22 <- filter(mean_scores, date %in% c('6/22/2022', '9/23/2022'))
 
 ggplot(micros_22, aes(x = trt, y = avg, fill = date))+
   geom_bar(stat = 'identity', position = 'dodge')+
-  facet_wrap(~date)+
+  facet_wrap(~date + crop)+
   ggtitle("2022")+
   geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
                  colour="orange", alpha=0.9, size=1.3)
@@ -158,7 +160,7 @@ micros_23 <- filter(mean_scores, date %in% c('7/18/2023','11/4/2023'))
 
 ggplot(micros_23, aes(x = trt, y = avg, fill = date))+
   geom_bar(stat = 'identity', position = 'dodge')+
-  facet_wrap(~date)+
+  facet_wrap(~date + crop)+
   ggtitle("2023")+
   geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
                  colour="orange", alpha=0.9, size=1.3)
@@ -166,6 +168,81 @@ ggplot(micros_23, aes(x = trt, y = avg, fill = date))+
 #
 ##
 ###
+
+# cc biomass time 
+cc_clean <- cc %>% 
+  mutate_at(vars(1:4), as.factor) %>% 
+  mutate(cc_biomass_g = as.numeric(cc_biomass_g)) %>% 
+  group_by(year, trt) %>% 
+  summarise(cc_mean = mean(cc_biomass_g),
+            cc_sd = sd(cc_biomass_g),
+            cc_se = cc_sd/sqrt(n()))
+
+ggplot(filter(cc_clean, trt != 'check'), aes(x = cc_mean, y = trt, fill = trt))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  facet_wrap(~year)+
+  coord_flip()
+
+# corn micros only
+# corn_micros <- mean_scores %>% 
+#   filter(crop %in% 'corn') %>% 
+#   print(n = Inf)
+# unique(corn_micros$crop)
+
+# total micros x year 
+# corn_micros_yr <- corn_micros %>% 
+#   ungroup() %>% 
+#   mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+#   mutate(year = format(date, "%Y")) %>% 
+#   relocate(year) %>% 
+#   select(-date) %>% 
+#   group_by(year, trt) %>% 
+#   summarise(year_mean = mean(avg))
+
+# the above code worked, but i think it was wrong 1/19/2024
+# # took the avg of an avg
+# #let's check this
+
+colnames(test)
+corn_micros_yr <- micro_scores %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_score = dplyr::select(.,5:33) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  mutate(block = case_when(plot %in% c(101,102,103,104) ~ 1,
+                           plot %in% c(201,202,203,204) ~ 2, 
+                           plot %in% c(301,302,303,304) ~ 3, 
+                           plot %in% c(401,402,403,404) ~ 4,
+                           plot %in% c(501,502,503,504) ~ 5)) %>% 
+  relocate(date, crop, plot, trt, block) %>% 
+  mutate(block = as.factor(block)) %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year, total_score) %>% 
+  select(-date) %>% 
+  group_by(year, trt, crop) %>% 
+  summarise(mean_score_yr = mean(total_score)) %>% 
+  filter(crop == 'corn') %>% 
+  select(-crop) %>% 
+  print(n = Inf)
+
+# cbind now
+new_micro_cc <- cbind(corn_micros_yr, cc_clean)
+new_micro_cc <- new_micro_cc %>% 
+  rename(year = year...4) %>% 
+  select(-year...1) %>% 
+  rename(trt = trt...2) %>% 
+  select(-trt...5) %>% 
+  relocate(year, trt)
+
+ggplot(filter(new_micro_cc, trt != 'Check'), aes(x = mean_score_yr, y = cc_mean, label = year))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  geom_smooth(method = 'lm') + 
+  scale_color_manual(values = c('brown', 'tan', 'green'))+
+  geom_text(vjust = -1, aes(fontface = 'bold'))+
+  guides(shape = FALSE)+
+  labs(title = "Micros x CC biomass and year", 
+       y = 'Average cc biomass (g)',
+       x = 'Average micro scores')
 
 
 
