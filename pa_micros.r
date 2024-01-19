@@ -108,6 +108,7 @@ colnames(micro_scores)
 ### 
 ##
 #
+(27.1/(sqrt(1))) # is this correct? this is how it is done in the pipe
 
 mean_scores <- micro_scores %>% 
   relocate(date, crop, plot, trt) %>% 
@@ -120,9 +121,10 @@ mean_scores <- micro_scores %>%
                               plot %in% c(501,502,503,504) ~ 5)) %>% 
   relocate(date, crop, plot, trt, block) %>% 
   mutate(block = as.factor(block)) %>% 
-  dplyr::group_by(date, trt) %>% 
-  dplyr::summarize(avg = mean(total_score), 
-                   sd = std.error(total_score)) %>% #plyr has summarize
+  dplyr::group_by(date, trt, crop) %>% 
+  dplyr::summarise(avg = mean(total_score), 
+                   sd = sd(total_score),
+                   se = sd/sqrt(n())) %>% #plyr has summarize
   print(n = Inf)
 colnames(mean_scores)
 unique(mean_scores$date)
@@ -138,7 +140,7 @@ ggplot(micros_21, aes(x = trt, y = avg, fill = date))+
   geom_bar(stat = 'identity', position = 'dodge')+
   facet_wrap(~date)+
   ggtitle("2021")+
-  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+  geom_errorbar( aes(x=trt, ymin=avg-se, ymax=avg+se), width=0.4, 
                  colour="orange", alpha=0.9, size=1.3)
 
 # 2022
