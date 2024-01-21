@@ -24,6 +24,7 @@ cc
 
 yield <- PSA_PA_yield
 yield
+
 # cleaning ####
 colnames(micros)
 unique(micros$date)
@@ -347,18 +348,37 @@ ggplot(filter(new_yield_abundance, trt != 'Check'), aes(x = bu_ac_mean, y = avg_
 
 # models
 # need different dfs
+
+# need to rethink these dfs for the model 1/20/2024
+# this needs to be average population by year match the yield df
 micro_model_df <- micros_set %>%
   filter(crop == 'corn') %>% 
   relocate(date, crop, plot, trt) %>% 
   mutate(total_abund = dplyr::select(.,5:43) %>% 
            rowSums(na.rm = TRUE)) %>% 
   dplyr::select(date, crop, plot, trt, total_abund) %>% 
+  mutate(block = case_when(plot %in% c(101,102,103,104) ~ 1,
+                           plot %in% c(201,202,203,204) ~ 2, 
+                           plot %in% c(301,302,303,304) ~ 3, 
+                           plot %in% c(401,402,403,404) ~ 4,
+                           plot %in% c(501,502,503,504) ~ 5)) %>% 
+  relocate(date, block) %>% 
   print(n = Inf)
 
 #yield_model_df
 yield %>% 
+  dplyr::select(-trt_num, -crop) %>% 
+  mutate(trt = as.factor(trt)) %>% 
+  mutate(year = as.factor(year)) %>%
+  group_by(year, trt) %>% 
+  summarise(lb_pass_mean = mean(lb_pass_moisture), 
+            lb_ac_mean = mean(lb_ac),
+            bu_ac_mean = mean(bu_ac)) %>% 
+  mutate(year = as.factor(year)) %>%
+  print(n = Inf)
   
-
+  
+  
 
 
 # #ymp1 <- glmer.nb(bu_ac_mean ~ avg_abund + (1|year), 
