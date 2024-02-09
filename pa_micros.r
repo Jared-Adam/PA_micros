@@ -563,7 +563,7 @@ yield %>%
 
 # permanova ####
 
-
+# FUCK
 # 2/9/2024 something is wrong here
 # dist will not work, r thinks all of my values are negative.. idk
 
@@ -590,7 +590,8 @@ permed_micros <- perm_micros %>%
   dplyr::select(-japy, - camp, -`Dip>5`, -`Dip<5`, -`Chil>5`, -`Chil<5`,
                 -col_20, -col_10, -col_6, -col_4, -Enich, -hemip, -sym, -pod, -ento, -Iso) %>% 
   replace(is.na(.),0) %>% 
-  mutate_at(vars(5:32), as.numeric)
+  mutate_at(vars(5:32), as.numeric) %>% 
+  filter(crop == 'beans')
 colnames(permed_micros)
 
 w <- subset(permed_micros, !complete.cases(permed_micros))
@@ -610,6 +611,7 @@ neg_beans <- filter(permed_micros, crop == "beans" & year == "2023")
 her <- neg_beans %>% filter(plot %in% c("104","303"))
 
 # perm 
+# com_cases <- complete.cases(permed_micros[6:32]): this gets rid of everything becuase it FDUCKEDUEDX
 perm_pops <- permed_micros[6:32]
 
 perm_dist <- vegdist(perm_pops, "bray")
@@ -618,4 +620,4 @@ perm_dist <- vegdist(perm_pops, "bray")
 x <- subset(perm_pops, !complete.cases(perm_pops))
 x
 
-perm_1 <- adonis2(perm_dist ~ crop, perm = 999, method = "bray", data = permed_micros)
+perm_1 <- adonis2(perm_dist ~ trt, perm = 999, method = "bray", data = permed_micros)
