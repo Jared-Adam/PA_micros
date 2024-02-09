@@ -19,8 +19,11 @@ library(MASS)
 micros <- CE2_counts
 micros
 
-cc <- PSA_PAcc_biomass
-cc
+cc <- PSA_corn_cc_biomass
+corn_cc
+
+bean_cc <- beans_cc_biomasss
+bean_cc
 
 yield <- PSA_PA_yield
 yield
@@ -226,18 +229,36 @@ ggplot(filter(micros_23, crop == "corn"), aes(x = trt, y = avg, fill = date))+
 
 # CC biomass ####
 # cc biomass time 
-cc_clean <- cc %>% 
+ccc_clean <- corn_cc %>% 
   mutate_at(vars(1:4), as.factor) %>% 
   mutate(cc_biomass_g = as.numeric(cc_biomass_g)) %>% 
   group_by(year, trt) %>% 
   summarise(cc_mean = mean(cc_biomass_g),
             cc_sd = sd(cc_biomass_g),
             cc_se = cc_sd/sqrt(n()))
+unique(bean_cc$trt)
+bcc_clean <- bean_cc %>% 
+  mutate_at(vars(1:2), as.factor) %>% 
+  mutate(cc_g = as.numeric(cc_g)) %>% 
+  mutate(trt = factor(trt, levels= c("br", "grbr", "gr"))) %>% 
+  group_by(year, trt) %>% 
+  summarise(cc_mean = mean(cc_g), 
+            cc_sd = sd(cc_g),
+            cc_se = cc_sd /sqrt(n()))
 
-ggplot(filter(cc_clean, trt != 'check'), aes(x = cc_mean, y = trt, fill = trt))+
+
+ggplot(filter(ccc_clean, trt != 'check'), aes(x = cc_mean, y = trt, fill = trt))+
   geom_bar(stat = 'identity', position = 'dodge')+
   facet_wrap(~year)+
-  coord_flip()
+  coord_flip()+
+  labs(title = "corn cc")
+
+ggplot(bcc_clean, aes(x = cc_mean, y = trt, fill = trt))+
+  geom_bar(stat = "identity", position = "dodge")+
+  facet_wrap(~year)+ 
+  coord_flip()+
+  labs(title = "beans cc")
+  
 
 # corn micros only
 # corn_micros <- mean_scores %>% 
@@ -264,6 +285,8 @@ ggplot(filter(cc_clean, trt != 'check'), aes(x = cc_mean, y = trt, fill = trt))+
 #
 
 # mirco scores x cc biomass ####
+
+# corn # 
 
 colnames(test)
 corn_micros_yr <- micro_scores %>% 
@@ -294,21 +317,120 @@ new_micro_cc <- new_micro_cc %>%
   dplyr::select(-year...1) %>% 
   rename(trt = trt...2) %>% 
   dplyr::select(-trt...5) %>% 
-  relocate(year, trt)
+  relocate(year, trt) %>% 
+  filter(trt != "Check")
 
-ggplot(filter(new_micro_cc, trt != 'Check'), aes(x = mean_score_yr, y = cc_mean, label = year))+
+ggplot(new_micro_cc, aes(x = cc_mean, y = mean_score_yr, label = year))+
   geom_point(aes(color = trt, shape = year),size = 6)+
   geom_smooth(method = 'lm') + 
   scale_color_manual(values = c('brown', 'tan', 'green'))+
   geom_text(vjust = -1, aes(fontface = 'bold'))+
   guides(shape = FALSE)+
   labs(title = "Micro scores x CC biomass and year", 
-       y = 'Average cc biomass (g)',
-       x = 'Average micro scores')
+       y = 'Average micro scores',
+       x = 'Average cc biomass (g)')
+
+ggplot(filter(new_micro_cc, year == "2021"), aes(x = cc_mean , y = mean_score_yr))+
+  geom_point(aes(color = trt), size = 6)+
+  geom_smooth(method = 'lm', se = FALSE) + 
+  scale_color_manual(values = c('brown', 'tan', 'green'))+
+  # geom_text(vjust = -1, aes(fontface = 'bold'))+
+  guides(shape = FALSE)+
+  labs(title = "2021 Corn: Micro scores x CC biomass and year", 
+       y = 'Average micro scores',
+       x = 'Average cc biomass (g)')
+
+ggplot(filter(new_micro_cc, year == "2022"), aes(x = cc_mean , y = mean_score_yr))+
+  geom_point(aes(color = trt), size = 6)+
+  geom_smooth(method = 'lm', se = FALSE) + 
+  scale_color_manual(values = c('brown', 'tan', 'green'))+
+  # geom_text(vjust = -1, aes(fontface = 'bold'))+
+  guides(shape = FALSE)+
+  labs(title = "2022 Corn: Micro scores x CC biomass and year", 
+       y = 'Average micro scores',
+       x = 'Average cc biomass (g)')
+
+ggplot(filter(new_micro_cc, year == "2023"), aes(x = cc_mean , y = mean_score_yr))+
+  geom_point(aes(color = trt), size = 6)+
+  geom_smooth(method = 'lm', se = FALSE) + 
+  scale_color_manual(values = c('brown', 'tan', 'green'))+
+  # geom_text(vjust = -1, aes(fontface = 'bold'))+
+  guides(shape = FALSE)+
+  labs(title = "2023 Corn: Micro scores x CC biomass and year", 
+       y = 'Average micro scores',
+       x = 'Average cc biomass (g)')
+
 
 ###
 ##
 #
+#
+##
+###
+
+# beans #
+bcc_clean 
+
+micro_scores
+unique(micro_scores$crop)
+bean_micros_yr <- micro_scores %>% 
+relocate(date, crop, plot, trt) %>% 
+  mutate(total_score = dplyr::select(.,5:33) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  mutate(block = case_when(plot %in% c(101,102,103,104) ~ 1,
+                           plot %in% c(201,202,203,204) ~ 2, 
+                           plot %in% c(301,302,303,304) ~ 3, 
+                           plot %in% c(401,402,403,404) ~ 4,
+                           plot %in% c(501,502,503,504) ~ 5)) %>% 
+  relocate(date, crop, plot, trt, block) %>% 
+  mutate(block = as.factor(block)) %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year, total_score) %>% 
+  dplyr::select(-date) %>% 
+  group_by(year, trt, crop) %>% 
+  summarise(mean_score_yr = mean(total_score)) %>% 
+  filter(crop == 'beans') %>% 
+  dplyr::select(-crop) %>% 
+  filter(trt != "Check") %>% 
+  print(n = Inf)
+
+new_micro_bcc <- cbind(bcc_clean, bean_micros_yr) %>% 
+  rename(trt = trt...2,
+         year = year...1) %>% 
+  dplyr::select(-trt...7,
+                -year...6)
+
+
+ggplot(new_micro_bcc, aes(x = mean_score_yr, y = cc_mean, label = year))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  geom_smooth(method = 'lm') + 
+  scale_color_manual(values = c('brown', 'tan', 'green'))+
+  geom_text(vjust = -1, aes(fontface = 'bold'))+
+  guides(shape = FALSE)+
+  labs(title = "Bean Micro scores x CC biomass and year", 
+       y = 'Average micro scores',
+       x = 'Average cc biomass (g)')
+
+ggplot(filter(new_micro_bcc, year == "2022"), aes(x = cc_mean , y = mean_score_yr))+
+  geom_point(aes(color = trt), size = 6)+
+  geom_smooth(method = 'lm', se = FALSE) + 
+  scale_color_manual(values = c('brown', 'tan', 'green'))+
+  # geom_text(vjust = -1, aes(fontface = 'bold'))+
+  guides(shape = FALSE)+
+  labs(title = "2022 Bean: Micro scores x CC biomass and year", 
+       y = 'Average micro scores',
+       x = 'Average cc biomass (g)')
+
+ggplot(filter(new_micro_bcc, year == "2023"), aes(x = cc_mean , y = mean_score_yr))+
+  geom_point(aes(color = trt), size = 6)+
+  geom_smooth(method = 'lm', se = FALSE) + 
+  scale_color_manual(values = c('brown', 'tan', 'green'))+
+  # geom_text(vjust = -1, aes(fontface = 'bold'))+
+  guides(shape = FALSE)+
+  labs(title = "2023 Bean: Micro scores x CC biomass and year", 
+       y = 'Average micro scores',
+       x = 'Average cc biomass (g)')
 
 # micro pops x cc biomass ####
 micros_set
@@ -440,6 +562,60 @@ yield %>%
 #
 
 # permanova ####
+
+
+# 2/9/2024 something is wrong here
+# dist will not work, r thinks all of my values are negative.. idk
+
+
 # need different values here
 # eliminate score columns 
 micros_set
+y <- subset(micros_set, !complete.cases(micros_set))
+y
+perm_micros <- micros_set %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year)
+z <- subset(perm_micros, !complete.cases(perm_micros))
+z
+
+colnames(perm_micros)
+permed_micros <- perm_micros %>% 
+  mutate(colembola = col_20 + col_10 + col_6 + col_4,
+         Diplopod = `Dip>5` + `Dip<5`,
+         Chilopoda = `Chil>5` + `Chil<5`,
+         Hemiptera = Enich + hemip) %>% 
+  dplyr::select(-japy, - camp, -`Dip>5`, -`Dip<5`, -`Chil>5`, -`Chil<5`,
+                -col_20, -col_10, -col_6, -col_4, -Enich, -hemip, -sym, -pod, -ento, -Iso) %>% 
+  replace(is.na(.),0) %>% 
+  mutate_at(vars(5:32), as.numeric)
+colnames(permed_micros)
+
+w <- subset(permed_micros, !complete.cases(permed_micros))
+w
+
+# only zeros? ISO was all zeros, checked here and then removed above 
+which(colSums(permed_micros!=0) == 0)
+which(rowSums(permed_micros!=0) == 0)
+mmm <- perm_pops %>% 
+  purrr::discard(~!any(. < 0))
+
+
+neg_data <- permed_micros[-(1:190), -(5:31)]
+neg_data
+
+neg_beans <- filter(permed_micros, crop == "beans" & year == "2023") 
+her <- neg_beans %>% filter(plot %in% c("104","303"))
+
+# perm 
+perm_pops <- permed_micros[6:32]
+
+perm_dist <- vegdist(perm_pops, "bray")
+
+# empty cell warning message 
+x <- subset(perm_pops, !complete.cases(perm_pops))
+x
+
+perm_1 <- adonis2(perm_dist ~ crop, perm = 999, method = "bray", data = permed_micros)
