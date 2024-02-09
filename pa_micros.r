@@ -131,44 +131,95 @@ mean_scores <- micro_scores %>%
   dplyr::summarise(avg = mean(total_score), 
                    sd = sd(total_score),
                    se = sd/sqrt(n())) %>% #plyr has summarize
+  mutate(date = as.Date(date, "%m/%d/%Y"),
+         year = format(date, form = "%Y"),
+         year = as.factor(year),
+         date = as.factor(date)) %>% 
   print(n = Inf)
 colnames(mean_scores)
 unique(mean_scores$date)
 
-ggplot(mean_scores, aes(x = trt, y = avg, fill = date))+
-  geom_bar(stat = 'identity', position = 'dodge')+
-  facet_wrap(~date)
+# score plots ####
 
-# 2021
-micros_21 <- filter(mean_scores, date %in% c("9/1/2021", "7/1/2021"))
-
-ggplot(micros_21, aes(x = trt, y = avg, fill = date))+
+ggplot(filter(mean_scores, crop == "beans"), aes(x = trt, y = avg, fill = date))+
   geom_bar(stat = 'identity', position = 'dodge')+
   facet_wrap(~date)+
-  ggtitle("2021")+
+  geom_errorbar(aes(x = trt, ymin = avg-se, ymax = avg+se))+
+  labs(title = "Overall beans mean QBS scores x year", 
+       x = "Treatment",
+       y = "Average QBS scores")
+
+ggplot(filter(mean_scores, crop == "corn"), aes(x = trt, y = avg, fill = date))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  facet_wrap(~date)+
+  geom_errorbar(aes(x = trt, ymin = avg-se, ymax = avg+se))+
+  labs(title = "Overall corn mean QBS scores x year", 
+       x = "Treatment",
+       y = "Average QBS scores")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12))
+
+
+
+
+
+
+# 2021
+# micros_21 <- filter(mean_scores, date %in% c("9/1/2021", "7/1/2021"))
+micros_21 <- filter(mean_scores, year == '2021')
+unique(micros_21$crop)
+
+ggplot(filter(micros_21, crop == "corn"), aes(x = trt, y = avg, fill = date))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  facet_wrap(~date)+
+  ggtitle("2021: Average corn QBS scores")+
+  labs(x = "Treatment",
+       y = "Average QBS score")+
   geom_errorbar( aes(x=trt, ymin=avg-se, ymax=avg+se), width=0.4, 
                  colour="orange", alpha=0.9, size=1.3)
 
 # 2022
-micros_22 <- filter(mean_scores, date %in% c('6/22/2022', '9/23/2022'))
+# micros_22 <- filter(mean_scores, date %in% c('6/22/2022', '9/23/2022'))
+micros_22 <- filter(mean_scores, year == "2022")
 
-ggplot(micros_22, aes(x = trt, y = avg, fill = date))+
+
+ggplot(filter(micros_22, crop == "beans"), aes(x = trt, y = avg, fill = date))+
   geom_bar(stat = 'identity', position = 'dodge')+
   facet_wrap(~date + crop)+
-  ggtitle("2022")+
+  ggtitle("2022: Average bean QBS scores")+
+  labs(x = "Treatment",
+       y = "Average QBS score")+
+  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+                 colour="orange", alpha=0.9, size=1.3)
+
+ggplot(filter(micros_22, crop == "corn"), aes(x = trt, y = avg, fill = date))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  facet_wrap(~date + crop)+
+  ggtitle("2022: Average corn QBS scores")+
+  labs(x = "Treatment",
+       y = "Average QBS score")+
   geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
                  colour="orange", alpha=0.9, size=1.3)
 
 # 2023
-micros_23 <- filter(mean_scores, date %in% c('7/18/2023','11/4/2023'))
-
-ggplot(micros_23, aes(x = trt, y = avg, fill = date))+
+# micros_23 <- filter(mean_scores, date %in% c('7/18/2023','11/4/2023'))
+micros_23 <- filter(mean_scores, year == "2023")
+ggplot(filter(micros_23, crop == "beans"), aes(x = trt, y = avg, fill = date))+
   geom_bar(stat = 'identity', position = 'dodge')+
   facet_wrap(~date + crop)+
-  ggtitle("2023")+
+  ggtitle("2023: Average QBS bean scores")+
+  labs(x = "Treatment",
+       y = "Average QBS score")+
   geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
                  colour="orange", alpha=0.9, size=1.3)
 
+ggplot(filter(micros_23, crop == "corn"), aes(x = trt, y = avg, fill = date))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  facet_wrap(~date + crop)+
+  ggtitle("2023: Average QBS corn scores")+
+  labs(x = "Treatment",
+       y = "Average QBS score")+
+  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+                 colour="orange", alpha=0.9, size=1.3)
 #
 ##
 ###
