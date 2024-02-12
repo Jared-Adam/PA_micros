@@ -50,6 +50,8 @@ micros_set <- micros_ready %>%
                          plot %in% c(104,202,301,404,504) ~ 'Gr-Br')) %>% 
   mutate_at(vars(1:3), as.factor) %>% 
   mutate_at(vars(43), as.factor) %>% 
+  filter(!row_number() %in% c(46,47,71,83)) %>% # these rows are all NA, so when I replace with 0, they become all 0 and then vegdist cannot function. removing them early
+  replace(is.na(.),0) %>% 
   print(n = Inf)
 # check to make sure these changes worked
 colnames(micros_set)
@@ -562,26 +564,18 @@ yield %>%
 #
 
 # permanova ####
-
-# FUCK
-# 2/9/2024 something is wrong here
-# dist will not work, r thinks all of my values are negative.. idk
-
-
 # need different values here
 # eliminate score columns 
 micros_set
-y <- subset(micros_set, !complete.cases(micros_set))
-y
+
 perm_micros <- micros_set %>% 
   relocate(date, crop, plot, trt) %>% 
   mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
   mutate(year = format(date, "%Y")) %>% 
-  relocate(year)
-z <- subset(perm_micros, !complete.cases(perm_micros))
-z
-
+  relocate(year) %>% 
+  mutate(year = as.factor(year))
 colnames(perm_micros)
+
 permed_micros <- perm_micros %>% 
   mutate(colembola = col_20 + col_10 + col_6 + col_4,
          Diplopod = `Dip>5` + `Dip<5`,
@@ -591,33 +585,55 @@ permed_micros <- perm_micros %>%
                 -col_20, -col_10, -col_6, -col_4, -Enich, -hemip, -sym, -pod, -ento, -Iso) %>% 
   replace(is.na(.),0) %>% 
   mutate_at(vars(5:32), as.numeric) %>% 
-  filter(crop == 'beans')
+  mutate(trt = as.factor(trt))
+# %>% 
+#   filter(crop == 'beans')
 colnames(permed_micros)
 
+# perm 
+
+perm_pops <- permed_micros[6:32]
+
+perm_dist <- vegdist(perm_pops, "bray")
+
+
+perm_1 <- adonis2(perm_dist ~ trt, permutations = 999, method = "bray", data = permed_micros)
+perm_1
+
+perm_2 <- adonis2(perm_dist ~ crop, permutations =  999, method = "bray", data = permed_micros)
+perm_2
+
+perm_3 <- adonis2(perm_dist ~ year + crop, permutations = 999, method = "bray", data = permed_micros)
+perm_3
+
+
+# troubhle shooting code ####
+#seeking complete.cases
+y <- subset(micros_set, !complete.cases(micros_set))
+y
+z <- subset(perm_micros, !complete.cases(perm_micros))
+z
 w <- subset(permed_micros, !complete.cases(permed_micros))
 w
+x <- subset(perm_pops, !complete.cases(perm_pops))
+x
+
+#removing rows will only 0s
+zeros_away <- permed_micros[rowSums(permed_micros[,5:32])>0,]
+zeros_away <- perm_pops[rowSums(perm_pops[])>0,]
 
 # only zeros? ISO was all zeros, checked here and then removed above 
 which(colSums(permed_micros!=0) == 0)
-which(rowSums(permed_micros!=0) == 0)
-mmm <- perm_pops %>% 
-  purrr::discard(~!any(. < 0))
+which(rowSums(permed_micros[5:32]!=0) == 0)
 
 
+# seeking negative values
 neg_data <- permed_micros[-(1:190), -(5:31)]
 neg_data
 
 neg_beans <- filter(permed_micros, crop == "beans" & year == "2023") 
 her <- neg_beans %>% filter(plot %in% c("104","303"))
 
-# perm 
-# com_cases <- complete.cases(permed_micros[6:32]): this gets rid of everything becuase it FDUCKEDUEDX
-perm_pops <- permed_micros[6:32]
-
-perm_dist <- vegdist(perm_pops, "bray")
-
+com_cases <- complete.cases(permed_micros[6:32]) #: this gets rid of everything becuase it FDUCKEDUEDX
 # empty cell warning message 
-x <- subset(perm_pops, !complete.cases(perm_pops))
-x
 
-perm_1 <- adonis2(perm_dist ~ trt, perm = 999, method = "bray", data = permed_micros)
