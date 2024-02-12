@@ -589,6 +589,10 @@ permed_micros <- perm_micros %>%
 # %>% 
 #   filter(crop == 'beans')
 colnames(permed_micros)
+# tt <- permed_micros 
+# tt[apply(tt[,-6], 1, function(x) !all(x==0))]
+# tt[rowSums(tt[, -5])>0, ]
+
 
 # perm 
 
@@ -611,6 +615,21 @@ pc <- permed_micros %>%
   filter(crop == "corn" & year == "2022")
 pb <- permed_micros %>% 
   filter(crop == "beans" & year == "2023")
+pc_pb <- rbind(pc, pb)
+pc_pb_pops <- pc_pb[6:32]
+
+pc_pb_dist <- vegdist(pc_pb_pops, method = "bray")
+p1_cb <- adonis2(pc_pb_dist ~ year + trt, permutations = 999, method = "bray", data = pc_pb)
+p1_cb
+
+# nmds ####
+# all data 
+
+# 2/12/24: issue here
+nmds1 <- metaMDS(perm_pops, k=3)
+stressplot(nmds1)
+
+
 
 # troubhle shooting code ####
 #seeking complete.cases
