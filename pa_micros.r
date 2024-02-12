@@ -606,6 +606,11 @@ perm_2
 perm_3 <- adonis2(perm_dist ~ year + crop, permutations = 999, method = "bray", data = permed_micros)
 perm_3
 
+# I want to look at permnanova between corn 22 and beans 23
+pc <- permed_micros %>% 
+  filter(crop == "corn" & year == "2022")
+pb <- permed_micros %>% 
+  filter(crop == "beans" & year == "2023")
 
 # troubhle shooting code ####
 #seeking complete.cases
