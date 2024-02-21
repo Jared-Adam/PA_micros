@@ -14,7 +14,7 @@ library(lme4)
 library(performance)
 library(lmtest)
 library(MASS)
-
+library(plotly)
 # data ####
 micros <- CE2_counts
 micros
@@ -144,6 +144,7 @@ mean_scores <- micro_scores %>%
 colnames(mean_scores)
 unique(mean_scores$date)
 
+
 # score plots ####
 
 ggplot(filter(mean_scores, crop == "beans"), aes(x = trt, y = avg, fill = date))+
@@ -170,7 +171,11 @@ ggplot(filter(mean_scores, crop == "corn"), aes(x = trt, y = avg, fill = date))+
 
 # 2021
 # micros_21 <- filter(mean_scores, date %in% c("9/1/2021", "7/1/2021"))
-micros_21 <- filter(mean_scores, year == '2021')
+unique(mean_scores$date)
+micros_21 <- filter(mean_scores, year == '2021') %>% 
+  mutate(timing = case_when( date == "2021-07-01"~ "1",
+                             date == "2021-09-01" ~ "2")) %>% 
+  mutate(timing = as.factor(timing))
 unique(micros_21$crop)
 
 ggplot(filter(micros_21, crop == "corn"), aes(x = trt, y = avg, fill = date))+
@@ -180,7 +185,7 @@ ggplot(filter(micros_21, crop == "corn"), aes(x = trt, y = avg, fill = date))+
   labs(x = "Treatment",
        y = "Average QBS score")+
   geom_errorbar( aes(x=trt, ymin=avg-se, ymax=avg+se), width=0.4, 
-                 colour="orange", alpha=0.9, size=1.3)
+                 colour="black", alpha=0.9, linewidth=1.3)
 
 # 2022
 # micros_22 <- filter(mean_scores, date %in% c('6/22/2022', '9/23/2022'))
