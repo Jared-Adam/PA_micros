@@ -144,29 +144,144 @@ mean_scores <- micro_scores %>%
 colnames(mean_scores)
 unique(mean_scores$date)
 
+overall_fig <- micro_scores %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_score = dplyr::select(.,5:33) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  mutate(block = case_when(plot %in% c(101,102,103,104) ~ 1,
+                           plot %in% c(201,202,203,204) ~ 2, 
+                           plot %in% c(301,302,303,304) ~ 3, 
+                           plot %in% c(401,402,403,404) ~ 4,
+                           plot %in% c(501,502,503,504) ~ 5)) %>% 
+  relocate(date, crop, plot, trt, block) %>% 
+  mutate(block = as.factor(block)) %>% 
+  dplyr::group_by(trt, crop) %>% 
+  dplyr::summarise(avg = mean(total_score), 
+                   sd = sd(total_score),
+                   se = sd/sqrt(n())) %>% 
+  print(n = Inf)
+
+# done here for now 
+# overall corn fig
+micro_scores %>%
+  filter(crop == "corn") %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_score = dplyr::select(.,5:33) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  mutate(block = case_when(plot %in% c(101,102,103,104) ~ 1,
+                           plot %in% c(201,202,203,204) ~ 2, 
+                           plot %in% c(301,302,303,304) ~ 3, 
+                           plot %in% c(401,402,403,404) ~ 4,
+                           plot %in% c(501,502,503,504) ~ 5)) %>% 
+  relocate(date, crop, plot, trt, block) %>% 
+  mutate(block = as.factor(block)) %>% 
+  dplyr::group_by(trt) %>% 
+  dplyr::summarise(avg = mean(total_score), 
+                   sd = sd(total_score),
+                   se = sd/sqrt(n())) %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y"),
+         year = format(date, form = "%Y"),
+         year = as.factor(year),
+         date = as.factor(date)) %>% 
+  print(n = Inf)
+
+# score stats ####
+# all them 
+
+total_ks_crop <- kruskal.test(avg ~ crop, data = mean_scores)
+total_ks_crop
+
+
+# beans 
+
+bean_scores <- mean_scores %>% 
+  filter(crop == "beans")
+b_22_scores <- bean_scores %>% 
+  filter(year == "2022")
+b_23_scores <- bean_scores %>% 
+  filter(year == "2023")
+
+b_22_d <- kruskal.test(avg ~ date, data = b_22_scores)
+b_22_d
+# date = 0.02092
+b_22_trt <- kruskal.test(avg ~ trt, data = b_22_scores)
+b_22_trt
+
+b_23_d <- kruskal.test(avg ~ date, data = b_23_scores)
+b_23_d
+b_23_trt <- kruskal.test(avg ~ trt, data = b_23_scores)
+b_23_trt
+
+b_year <- kruskal.test(avg ~ year, data = bean_scores)
+b_year
+
+# corn
+
+# 2021 is only corn
+micros_21 <- filter(mean_scores, year == '2021') %>% 
+  mutate(timing = case_when( date == "2021-07-01"~ "1",
+                             date == "2021-09-01" ~ "2")) %>% 
+  mutate(timing = as.factor(timing))
+corn_21_d <- kruskal.test(avg ~ date, data  = micros_21)
+corn_21_d
+corn_21_trt <- kruskal.test(avg ~ trt, data = micros_21)
+corn_21_trt
+
+corn_scores <- mean_scores %>% 
+  filter(crop == "corn")
+c_22_scores <- corn_scores %>% 
+  filter(year == "2022")
+c_23_scores <- corn_scores %>% 
+  filter(year == "2023")
+
+corn_22_d <- kruskal.test(avg ~ date, data  = c_22_scores)
+corn_22_d
+corn_22_trt <- kruskal.test(avg ~ trt, data = c_22_scores)
+corn_22_trt
+corn_23_d <- kruskal.test(avg ~ date, data  = c_23_scores)
+corn_23_d
+corn_23_trt <- kruskal.test(avg ~ trt, data = c_23_scores)
+corn_23_trt
+
+corn_year <- kruskal.test(avg ~ year, data = corn_scores)
+corn_year
+pairwise.wilcox.test(corn_scores$avg, corn_scores$year, p.adjust.method = "BH")
 
 # score plots ####
 
-ggplot(filter(mean_scores, crop == "beans"), aes(x = trt, y = avg, fill = date))+
-  geom_bar(stat = 'identity', position = 'dodge')+
-  facet_wrap(~date)+
-  geom_errorbar(aes(x = trt, ymin = avg-se, ymax = avg+se))+
-  labs(title = "Overall beans mean QBS scores x year", 
-       x = "Treatment",
-       y = "Average QBS scores")
 
-ggplot(filter(mean_scores, crop == "corn"), aes(x = trt, y = avg, fill = date))+
-  geom_bar(stat = 'identity', position = 'dodge')+
-  facet_wrap(~date)+
-  geom_errorbar(aes(x = trt, ymin = avg-se, ymax = avg+se))+
-  labs(title = "Overall corn mean QBS scores x year", 
+
+ggplot(overall_fig, aes(x = trt, y = avg, fill = crop))+
+  geom_bar(stat = 'identity', position = "dodge")+
+  scale_fill_manual(values = c( "#1B9E77","#D95F02"),
+                    name = "Crop", labels = c("Soybean", "Corn"))+
+  scale_x_discrete(labels=c("Check", "Brown", "Green", "GrBr"))+
+  geom_errorbar(aes(x = trt, ymin = avg-se, ymax = avg+se), 
+                position = position_dodge(0.9),
+                width = 0.4, linewidth = 1.3)+
+  labs(title = "Overall average QBS scores by crop",
+       subtitle = "Years: 2021-2023",
        x = "Treatment",
        y = "Average QBS scores")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12))
+  theme(legend.text = element_text(size = 14),
+        legend.title = element_text(size = 16),
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
-
-
-
+# ggplot(filter(mean_scores, crop == "corn"), aes(x = trt, y = avg, fill = date))+
+#   geom_bar(stat = 'identity', position = 'dodge')+
+#   facet_wrap(~date)+
+#   geom_errorbar(aes(x = trt, ymin = avg-se, ymax = avg+se))+
+#   labs(title = "Overall corn mean QBS scores x year", 
+#        x = "Treatment",
+#        y = "Average QBS scores")+
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12))
 
 
 # 2021
@@ -178,60 +293,127 @@ micros_21 <- filter(mean_scores, year == '2021') %>%
   mutate(timing = as.factor(timing))
 unique(micros_21$crop)
 
-ggplot(filter(micros_21, crop == "corn"), aes(x = trt, y = avg, fill = date))+
+ggplot(filter(micros_21, crop == "corn"), aes(x = trt, y = avg, fill = trt))+
   geom_bar(stat = 'identity', position = 'dodge')+
+  scale_fill_manual(values = c("#E7298A", "#D95F02", "#1B9E77", "#7570B3"))+
+  scale_x_discrete(labels=c("Check", "Brown", "Green", "GrBr"))+
   facet_wrap(~date)+
-  ggtitle("2021: Average corn QBS scores")+
-  labs(x = "Treatment",
+  ggtitle("Corn: Average QBS scores")+
+  labs(subtitle = "Year: 2021",
+       x = "Treatment",
        y = "Average QBS score")+
   geom_errorbar( aes(x=trt, ymin=avg-se, ymax=avg+se), width=0.4, 
-                 colour="black", alpha=0.9, linewidth=1.3)
+                 colour="black", alpha=0.9, linewidth=1.3)+
+  theme(legend.position = "none",
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
 # 2022
 # micros_22 <- filter(mean_scores, date %in% c('6/22/2022', '9/23/2022'))
 micros_22 <- filter(mean_scores, year == "2022")
+unique(micros_22$date)
 
 
-ggplot(filter(micros_22, crop == "beans"), aes(x = trt, y = avg, fill = date))+
+# dat_text <- data.frame(
+#   avg = 100, 
+#   lab = "*",
+#   date = factor("2022-06-22", levels = c("2022-06-22", "2022-09-23")))
+
+ggplot(filter(micros_22, crop == "beans"), aes(x = trt, y = avg, fill = trt))+
   geom_bar(stat = 'identity', position = 'dodge')+
-  facet_wrap(~date + crop)+
-  ggtitle("2022: Average bean QBS scores")+
-  labs(x = "Treatment",
+  scale_fill_manual(values = c("#E7298A", "#D95F02", "#1B9E77", "#7570B3"))+
+  scale_x_discrete(labels=c("Check", "Brown", "Green", "GrBr"))+
+  facet_wrap(~factor(date, c("2022-06-22", "2022-09-23")))+
+  ggtitle("Soybean: Average QBS scores")+
+  labs(subtitle = "Year: 2022",
+       x = "Treatment",
        y = "Average QBS score")+
   geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
-                 colour="orange", alpha=0.9, size=1.3)
+                 colour="black", alpha=0.9, size=1.3)+
+  theme(legend.position = "none",
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
-ggplot(filter(micros_22, crop == "corn"), aes(x = trt, y = avg, fill = date))+
+ggplot(filter(micros_22, crop == "corn"), aes(x = trt, y = avg, fill = trt))+
   geom_bar(stat = 'identity', position = 'dodge')+
-  facet_wrap(~date + crop)+
-  ggtitle("2022: Average corn QBS scores")+
-  labs(x = "Treatment",
+  scale_fill_manual(values = c("#E7298A", "#D95F02", "#1B9E77", "#7570B3"))+
+  scale_x_discrete(labels=c("Check", "Brown", "Green", "GrBr"))+
+  facet_wrap(~factor(date, c("2022-06-22", "2022-09-23")))+
+  ggtitle("Corn: Average QBS scores")+
+  labs(subtitle = "Year: 2022",
+       x = "Treatment",
        y = "Average QBS score")+
   geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
-                 colour="orange", alpha=0.9, size=1.3)
+                 colour="black", alpha=0.9, size=1.3)+
+  theme(legend.position = "none",
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
 # 2023
 # micros_23 <- filter(mean_scores, date %in% c('7/18/2023','11/4/2023'))
 micros_23 <- filter(mean_scores, year == "2023")
-ggplot(filter(micros_23, crop == "beans"), aes(x = trt, y = avg, fill = date))+
-  geom_bar(stat = 'identity', position = 'dodge')+
-  facet_wrap(~date + crop)+
-  ggtitle("2023: Average QBS bean scores")+
-  labs(x = "Treatment",
-       y = "Average QBS score")+
-  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
-                 colour="orange", alpha=0.9, size=1.3)
+unique(micros_23$date)
 
-ggplot(filter(micros_23, crop == "corn"), aes(x = trt, y = avg, fill = date))+
+
+ggplot(filter(micros_23, crop == "beans"), aes(x = trt, y = avg, fill = trt))+
   geom_bar(stat = 'identity', position = 'dodge')+
-  facet_wrap(~date + crop)+
-  ggtitle("2023: Average QBS corn scores")+
-  labs(x = "Treatment",
+  scale_fill_manual(values = c("#E7298A", "#D95F02", "#1B9E77", "#7570B3"))+
+  scale_x_discrete(labels=c("Check", "Brown", "Green", "GrBr"))+
+  facet_wrap(~factor(date, c("2023-07-18","2023-11-04")))+
+  ggtitle("Soybean: Average QBS scores")+
+  labs(subtitle = "Year: 2023",
+       x = "Treatment",
        y = "Average QBS score")+
   geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
-                 colour="orange", alpha=0.9, size=1.3)
-#
-##
+                 colour="black", alpha=0.9, size=1.3)+
+  theme(legend.position = "none",
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+ggplot(filter(micros_23, crop == "corn"), aes(x = trt, y = avg, fill = trt))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  scale_fill_manual(values = c("#E7298A", "#D95F02", "#1B9E77", "#7570B3"))+
+  scale_x_discrete(labels=c("Check", "Brown", "Green", "GrBr"))+
+  facet_wrap(~factor(date, c("2023-07-18","2023-11-04")))+
+  ggtitle("Corn: Average QBS scores")+
+  labs(subtitle = "Year: 2023",
+       x = "Treatment",
+       y = "Average QBS score")+
+  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+                 colour="black", alpha=0.9, size=1.3)+
+  theme(legend.position = "none",
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())##
 ###
 
 # CC biomass ####
