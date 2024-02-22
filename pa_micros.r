@@ -19,7 +19,7 @@ library(plotly)
 micros <- CE2_counts
 micros
 
-cc <- PSA_corn_cc_biomass
+corn_cc <- PSA_corn_cc_biomass
 corn_cc
 
 bean_cc <- beans_cc_biomasss
@@ -366,7 +366,7 @@ ggplot(filter(micros_22, crop == "beans"), aes(x = trt, y = avg, fill = trt))+
   labs(subtitle = "Year: 2022",
        x = "Treatment",
        y = "Average QBS score")+
-  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+  geom_errorbar( aes(x=trt, ymin=avg-se, ymax=avg+se), width=0.4, 
                  colour="black", alpha=0.9, size=1.3)+
   theme(legend.position = "none",
         axis.text.x = element_text(size=18, angle = 45, hjust = 1),
@@ -387,7 +387,7 @@ ggplot(filter(micros_22, crop == "corn"), aes(x = trt, y = avg, fill = trt))+
   labs(subtitle = "Year: 2022",
        x = "Treatment",
        y = "Average QBS score")+
-  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+  geom_errorbar( aes(x=trt, ymin=avg-se, ymax=avg+se), width=0.4, 
                  colour="black", alpha=0.9, size=1.3)+
   theme(legend.position = "none",
         axis.text.x = element_text(size=18, angle = 45, hjust = 1),
@@ -414,7 +414,7 @@ ggplot(filter(micros_23, crop == "beans"), aes(x = trt, y = avg, fill = trt))+
   labs(subtitle = "Year: 2023",
        x = "Treatment",
        y = "Average QBS score")+
-  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+  geom_errorbar( aes(x=trt, ymin=avg-se, ymax=avg+se), width=0.4, 
                  colour="black", alpha=0.9, size=1.3)+
   theme(legend.position = "none",
         axis.text.x = element_text(size=18, angle = 45, hjust = 1),
@@ -435,7 +435,7 @@ ggplot(filter(micros_23, crop == "corn"), aes(x = trt, y = avg, fill = trt))+
   labs(subtitle = "Year: 2023",
        x = "Treatment",
        y = "Average QBS score")+
-  geom_errorbar( aes(x=trt, ymin=avg-sd, ymax=avg+sd), width=0.4, 
+  geom_errorbar( aes(x=trt, ymin=avg-se, ymax=avg+se), width=0.4, 
                  colour="black", alpha=0.9, size=1.3)+
   theme(legend.position = "none",
         axis.text.x = element_text(size=18, angle = 45, hjust = 1),
@@ -448,7 +448,7 @@ ggplot(filter(micros_23, crop == "corn"), aes(x = trt, y = avg, fill = trt))+
         panel.grid.minor = element_blank())##
 ###
 
-# CC biomass ####
+# CC biomass stats ####
 # cc biomass time 
 ccc_clean <- corn_cc %>% 
   mutate_at(vars(1:4), as.factor) %>% 
@@ -467,18 +467,159 @@ bcc_clean <- bean_cc %>%
             cc_sd = sd(cc_g),
             cc_se = cc_sd /sqrt(n()))
 
+# bean stats
+bcc_ <- bean_cc %>% 
+  mutate_at(vars(1:3), as.factor) %>% 
+  group_by(year, plot, trt) %>% 
+  summarise(mean = mean(cc_g))
+bbc_aov <- aov(mean ~ year, data = bcc_)
+hist(residuals(bbc_aov))
+summary(bbc_aov)
+TukeyHSD(bbc_aov)
 
-ggplot(filter(ccc_clean, trt != 'check'), aes(x = cc_mean, y = trt, fill = trt))+
-  geom_bar(stat = 'identity', position = 'dodge')+
-  facet_wrap(~year)+
-  coord_flip()+
-  labs(title = "corn cc")
+bcc_22 <- bcc_ %>% 
+  filter(year == "2022")
+bbc_22_aov <- aov(mean ~ trt, data = bcc_22)
+hist(residuals(bbc_22_aov))
+summary(bbc_22_aov)
+TukeyHSD(bbc_22_aov)
 
-ggplot(bcc_clean, aes(x = cc_mean, y = trt, fill = trt))+
+bcc_23 <- bcc_ %>% 
+  filter(year == "2023")
+bbc_23_aov <- aov(mean ~ trt, data = bcc_23)
+hist(residuals(bbc_23_aov))
+summary(bbc_23_aov)
+TukeyHSD(bbc_23_aov)
+
+# corn stats
+cc_ <- corn_cc %>%
+  filter(trt != "check") %>% 
+  mutate(cc_biomass_g = as.numeric(cc_biomass_g)) %>% 
+  mutate(year = as.factor(year)) %>% 
+  group_by(year, plot, trt) %>% 
+  summarise(mean = mean(cc_biomass_g))
+cc_aov <- aov(mean ~ year, data = cc_)
+hist(residuals(cc_aov))
+summary(cc_aov)
+TukeyHSD(cc_aov)
+# 21-22 diff, 21-23 diff, 22-23 no diff
+
+cc_21 <- cc_ %>% 
+  filter(year == "2021")
+cc_21_aov <- aov(mean ~ trt, data = cc_21)
+hist(residuals(cc_21_aov))
+summary(cc_21_aov)
+TukeyHSD(cc_21_aov)
+# all diff
+
+
+cc_22 <- cc_ %>% 
+  filter(year == "2022")
+cc_22_aov <- aov(mean ~ trt, data = cc_22)
+hist(residuals(cc_22_aov))
+summary(cc_22_aov)
+TukeyHSD(cc_22_aov)
+# all diff
+
+cc_23 <- cc_ %>% 
+  filter(year == "2023")
+cc_23_aov <- aov(mean ~ trt, data = cc_23)
+hist(residuals(cc_23_aov))
+summary(cc_23_aov)
+TukeyHSD(cc_23_aov)
+#grbr-br = diff, gr - br = diff
+
+# cc biomass plots ####
+bcc_
+ggplot(bcc_, aes(x = trt, y = mean, fill = trt))+
+  geom_violin()+
+  geom_jitter()+
+  scale_x_discrete(limits=c("br", "gr", "grbr"),
+                   labels = c("Brown", "Green", "GrBr"))+  
+  scale_fill_manual(values = c("#D95F02", "#1B9E77", "#7570B3"))+
+  facet_wrap(~year, scales = "free")+
+  labs(title = "Soybean: Cover crop biomass",
+       subtitle = "Years: 2022-2023",
+       x = "Treatment",
+       y = "Average cover crop biomass")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+bcc_clean
+ggplot(bcc_clean, aes(x = trt, y = cc_mean, fill = trt))+
   geom_bar(stat = "identity", position = "dodge")+
-  facet_wrap(~year)+ 
-  coord_flip()+
-  labs(title = "beans cc")
+  scale_x_discrete(limits=c("br", "gr", "grbr"),
+                   labels = c("Brown", "Green", "GrBr"))+  
+  scale_fill_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
+  facet_wrap(~year)+
+  geom_errorbar(aes(x = trt, ymin = cc_mean-cc_se, ymax = cc_mean+cc_se), width=0.4, 
+                colour="black", alpha=0.9, linewidth=1.3)+
+  labs(title = "Soybean: Cover crop biomass",
+       subtitle = "Years: 2022-2023",
+       x = "Treatment",
+       y = "Average cover crop biomass")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+ggplot(cc_, aes(x = trt, y = mean, fill = trt))+
+  geom_violin()+
+  geom_jitter()+
+  scale_x_discrete(limits=c("brown", "green", "gr-br"),
+                   labels = c("Brown", "Green", "GrBr"))+  
+  scale_fill_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
+  facet_wrap(~year, scales = "free")+
+  labs(title = "Corn: Cover crop biomass",
+       subtitle = "Years: 2021-2023",
+       x = "Treatment",
+       y = "Average cover crop biomass")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+ggplot(filter(ccc_clean, trt != 'check'), aes(x = trt, y = cc_mean, fill = trt))+
+  geom_bar(stat = 'identity', position = 'dodge')+
+  scale_fill_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
+  scale_x_discrete(limits=c("brown", "green", "gr-br"),
+                   labels = c("Brown", "Green", "GrBr"))+
+  facet_wrap(~year)+
+  geom_errorbar(aes(x = trt, ymin = cc_mean-cc_se, ymax = cc_mean+cc_se), width=0.4, 
+                colour="black", alpha=0.9, linewidth=1.3)+
+  labs(title = "Corn: Cover crop biomass",
+       subtitle = "Years: 2021-2023",
+       x = "Treatment",
+       y = "Average cover crop biomass")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+  
+
+
   
 
 # corn micros only
