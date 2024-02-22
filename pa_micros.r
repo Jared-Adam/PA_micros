@@ -163,7 +163,7 @@ overall_fig <- micro_scores %>%
 
 # done here for now 
 # overall corn fig
-micro_scores %>%
+corn_trt_year_score <- micro_scores %>%
   filter(crop == "corn") %>% 
   relocate(date, crop, plot, trt) %>% 
   mutate(total_score = dplyr::select(.,5:33) %>% 
@@ -175,14 +175,14 @@ micro_scores %>%
                            plot %in% c(501,502,503,504) ~ 5)) %>% 
   relocate(date, crop, plot, trt, block) %>% 
   mutate(block = as.factor(block)) %>% 
-  dplyr::group_by(trt) %>% 
-  dplyr::summarise(avg = mean(total_score), 
-                   sd = sd(total_score),
-                   se = sd/sqrt(n())) %>% 
   mutate(date = as.Date(date, "%m/%d/%Y"),
          year = format(date, form = "%Y"),
          year = as.factor(year),
-         date = as.factor(date)) %>% 
+         date = as.factor(date)) %>%
+  dplyr::group_by(year, trt) %>% 
+    dplyr::summarise(avg = mean(total_score), 
+                   sd = sd(total_score),
+                   se = sd/sqrt(n())) %>% 
   print(n = Inf)
 
 # score stats ####
@@ -246,10 +246,12 @@ corn_23_trt
 corn_year <- kruskal.test(avg ~ year, data = corn_scores)
 corn_year
 pairwise.wilcox.test(corn_scores$avg, corn_scores$year, p.adjust.method = "BH")
+# 0.0011 
+# 2021 - 23 = 0.00047
+# 2021 - 22 = 0.0028
+
 
 # score plots ####
-
-
 
 ggplot(overall_fig, aes(x = trt, y = avg, fill = crop))+
   geom_bar(stat = 'identity', position = "dodge")+
@@ -282,6 +284,36 @@ ggplot(overall_fig, aes(x = trt, y = avg, fill = crop))+
 #        x = "Treatment",
 #        y = "Average QBS scores")+
 #   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12))
+
+# corn by year plot 
+corn_trt_year_score
+
+ggplot(corn_trt_year_score, aes(x = year, y = avg, fill = factor(trt, levels = c("Check", "Brown", "Green", "Gr-Br"))))+
+  geom_bar(stat = 'identity', position = "dodge")+
+  scale_fill_manual(values = c("#E7298A", "#D95F02", "#1B9E77", "#7570B3"),
+                    name = "Treatment")+
+  geom_errorbar(aes(x = year, ymin = avg-se, ymax = avg+se), 
+                position = position_dodge(0.9),
+                width = 0.4, linewidth = 1.3)+
+  labs(title = "Corn: Overall average QBS scores by crop",
+       subtitle = "Years: 2021-2023",
+       x = "Treatment",
+       y = "Average QBS scores")+
+  theme(legend.text = element_text(size = 14),
+        legend.title = element_text(size = 16),
+        axis.text.x = element_text(size=18, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 18),
+        strip.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(s = 16), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+  annotate("text", x = 0.8, y = 110, label = "a", size = 8)+
+  annotate("text", x = 1.8, y = 65, label = "b", size = 8)+
+  annotate("text", x = 2.8, y = 65, label = "b", size = 8)+
+  annotate("text", x = .8, y = 115, label = "p = 0.0011", size = 8)
+  
 
 
 # 2021
