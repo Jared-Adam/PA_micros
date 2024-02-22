@@ -15,6 +15,8 @@ library(performance)
 library(lmtest)
 library(MASS)
 library(plotly)
+library(ggpmisc)
+
 # data ####
 micros <- CE2_counts
 micros
@@ -673,7 +675,7 @@ corn_micros_yr <- micro_scores %>%
   print(n = Inf)
 
 # cbind now
-new_micro_cc <- cbind(corn_micros_yr, cc_clean)
+new_micro_cc <- cbind(corn_micros_yr, ccc_clean)
 new_micro_cc <- new_micro_cc %>% 
   rename(year = year...4) %>% 
   dplyr::select(-year...1) %>% 
@@ -794,7 +796,10 @@ ggplot(filter(new_micro_bcc, year == "2023"), aes(x = cc_mean , y = mean_score_y
        y = 'Average micro scores',
        x = 'Average cc biomass (g)')
 
-# micro pops x cc biomass ####
+# micro abundance x cc biomass ####
+
+# corn
+
 micros_set
 colnames(micros_set)
 unique(micros_set$crop)
@@ -811,22 +816,95 @@ corn_micro_totals <- micros_set %>%
   group_by(year, trt) %>% 
   summarise(avg_abund = mean(total_abund))
 
-new_total_cc <- cbind(cc_clean, corn_micro_totals)
+new_total_cc <- cbind(ccc_clean, corn_micro_totals)
 new_total_cc <- new_total_cc %>% 
   rename(year = year...1, 
          trt = trt...7) %>% 
   dplyr::select(-year...6, -trt...2)
 
-ggplot(filter(new_total_cc, trt != 'Check'), aes(x = avg_abund, y = cc_mean, label = year))+
-  geom_point(aes(color = trt, shape = year),size = 6)+
-  geom_smooth(method = 'lm') + 
-  scale_color_manual(values = c('brown', 'tan', 'green'))+
-  geom_text(vjust = -1, aes(fontface = 'bold'))+
-  guides(shape = FALSE)+
-  labs(title = "Micro abundance x CC biomass and year", 
-       y = 'Average cc biomass (g)',
-       x = 'Average micro abundance')
+?glm
+cc_abund_cc <- glm(avg_abund ~ cc_mean,
+                   data = new_total_cc)
+hist(residuals(cc_abund_cc))
+summary(cc_abund_cc)
 
+ggplot(filter(new_total_cc, trt != 'Check'), aes(x = avg_abund, y = cc_mean))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
+  labs(title = "Corn: Micro abundance x CC biomass",
+       subtitle = "Years: 2021-2023",
+       y = 'Average cc biomass (g)',
+       x = 'Average micro abundance')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+            axis.text = element_text(size = 18),
+            axis.title = element_text(size = 20),
+            plot.title = element_text(size = 24),
+            plot.subtitle = element_text(size = 18),
+            axis.line = element_line(size = 1.25),
+            axis.ticks = element_line(size = 1.25),
+            axis.ticks.length = unit(.25, "cm"),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())+
+  annotate("text", x = 19, y = 260, label = "p = 0.00229 **", size = 8)
+
+# beans 
+
+micros_set
+colnames(micros_set)
+unique(micros_set$crop)
+bean_micro_totals <- micros_set %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_abund = dplyr::select(.,5:43) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  dplyr::select(date, crop, plot, trt, total_abund) %>% 
+  filter(crop == 'beans') %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year) %>% 
+  dplyr::select(-date) %>% 
+  group_by(year, trt) %>% 
+  summarise(avg_abund = mean(total_abund)) %>% 
+  filter(trt != "Check")
+
+bcc_clean
+new_total_bcc <- cbind(bcc_clean, bean_micro_totals)
+new_total_bcc <- new_total_bcc %>% 
+  rename(year = year...1, 
+         trt = trt...2) %>% 
+  dplyr::select(-year...6, -trt...7) %>% 
+  mutate(trt = case_when(trt == "br" ~ "Brown",
+                         trt == "grbr" ~ "Gr-Br",
+                         trt == "gr" ~ "Green"))
+
+?glm
+bb_abund_cc <- glm(avg_abund ~ cc_mean,
+                     data = new_total_bcc)
+hist(residuals(bb_abund_cc))
+summary(bb_abund_cc)
+
+ggplot(new_total_bcc, aes(x = avg_abund, y = cc_mean))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  #geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
+  labs(title = "Soybean: Micro abundance x CC biomass",
+       subtitle = "Years: 2022-2023",
+       y = 'Average cc biomass (g)',
+       x = 'Average micro abundance')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
 ###
 ##
