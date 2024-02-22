@@ -30,6 +30,8 @@ bean_cc
 yield <- PSA_PA_yield
 yield
 
+bean_yield <- PA_PSA_beans_yield_all
+
 # cleaning ####
 colnames(micros)
 unique(micros$date)
@@ -823,17 +825,17 @@ new_total_cc <- new_total_cc %>%
   dplyr::select(-year...6, -trt...2)
 
 ?glm
-cc_abund_cc <- glm(avg_abund ~ cc_mean,
+cc_ccXabund <- glm(cc_mean ~ avg_abund,
                    data = new_total_cc)
-hist(residuals(cc_abund_cc))
-summary(cc_abund_cc)
+hist(residuals(cc_ccXabund))
+summary(cc_ccXabund)
 
 ggplot(filter(new_total_cc, trt != 'Check'), aes(x = avg_abund, y = cc_mean))+
   geom_point(aes(color = trt, shape = year),size = 6)+
   geom_smooth(method = 'lm', color = "black", size = 1.5) + 
   stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
   scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
-  labs(title = "Corn: Micro abundance x CC biomass",
+  labs(title = "Corn: CC biomass ~ Micro abundance",
        subtitle = "Years: 2021-2023",
        y = 'Average cc biomass (g)',
        x = 'Average micro abundance')+
@@ -848,7 +850,34 @@ ggplot(filter(new_total_cc, trt != 'Check'), aes(x = avg_abund, y = cc_mean))+
             axis.ticks.length = unit(.25, "cm"),
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank())+
-  annotate("text", x = 19, y = 260, label = "p = 0.00229 **", size = 8)
+  annotate("text", x = 17, y = 260, label = "p = 0.00229 **", size = 8)
+
+cc_abund_cc <- glm(avg_abund ~ cc_mean,
+                   data = new_total_cc)
+hist(residuals(cc_abund_cc))
+summary(cc_abund_cc)
+
+ggplot(filter(new_total_cc, trt != 'Check'), aes(x = cc_mean, y = avg_abund))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
+  labs(title = "Corn: Micro abundance ~ CC biomass",
+       subtitle = "Years: 2021-2023",
+       y = 'Average micro abundance',
+       x = 'Average cc biomass (g)')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+  annotate("text", x = 35, y = 90, label = "p = 0.00229 **", size = 8)
 
 # beans 
 
@@ -890,7 +919,7 @@ ggplot(new_total_bcc, aes(x = avg_abund, y = cc_mean))+
   #geom_smooth(method = 'lm', color = "black", size = 1.5) + 
   stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
   scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
-  labs(title = "Soybean: Micro abundance x CC biomass",
+  labs(title = "Soybean: CC biomass ~ Micro abundance ",
        subtitle = "Years: 2022-2023",
        y = 'Average cc biomass (g)',
        x = 'Average micro abundance')+
@@ -906,11 +935,34 @@ ggplot(new_total_bcc, aes(x = avg_abund, y = cc_mean))+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
 
+ggplot(new_total_bcc, aes(x = cc_mean, y = avg_abund))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  #geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
+  labs(title = "Soybean: Micro abundance ~ CC biomass",
+       subtitle = "Years: 2022-2023",
+       y = 'Average micro abundance',
+       x = 'Average cc biomass (g)')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 ###
 ##
 #
 
 # yield x micro pops ####
+
+# Corn 
+
 yield
 colnames(yield)
 
@@ -949,19 +1001,158 @@ new_yield_abundance <- new_yield_abundance %>%
   relocate(year, trt) %>% 
   print( n = Inf)
 
-ggplot(filter(new_yield_abundance, trt != 'Check'), aes(x = bu_ac_mean, y = avg_abund, label = year))+
+?glm
+
+
+cc_yield_yield <- glm(bu_ac_mean ~ avg_abund,
+                      data = new_yield_abundance)
+hist(residuals(cc_yield_yield))
+summary(cc_yield_yield)
+
+ggplot(new_yield_abundance, aes(x = avg_abund, y = bu_ac_mean))+
   geom_point(aes(color = trt, shape = year),size = 6)+
-  geom_smooth(method = 'lm') + 
-  scale_color_manual(values = c('brown', 'tan', 'green'))+
-  geom_text(vjust = -1, aes(fontface = 'bold'))+
-  guides(shape = FALSE)+
-  labs(title = "Micro abundance x yield and year", 
+  geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02", "#E7298A","#7570B3", "#1B9E77"))+
+  labs(title = "Corn: Yield ~ Micro abundance",
+       subtitle = "Years: 2021-2023",
+       y = 'Average bu/ac',
+       x = 'Average micro abundance')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+  annotate("text", x = 18, y = 240, label = "p = 0.001999 **", size = 8)
+
+cc_abund_yield <- glm(avg_abund ~ bu_ac_mean,
+                   data = new_yield_abundance)
+hist(residuals(cc_abund_yield))
+summary(cc_abund_yield)
+
+ggplot(new_yield_abundance, aes(x = bu_ac_mean, y = avg_abund))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02","#E7298A" ,"#7570B3", "#1B9E77"))+
+  labs(title = "Corn: Micro abundance ~ Yield",
+       subtitle = "Years: 2021-2023",
        y = 'Average micro abundance',
-       x = 'Average bu/ac')
+       x = 'Average bu/ac')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+  annotate("text", x = 104, y = 64, label = "p = 0.002 **", size = 8)
 
-# models
-# need different dfs
+# Beans
+bean_yield$plot <- gsub('-[0-9.]','', bean_yield$plot) # remove - and all numbers following
 
+
+by_clean <- bean_yield %>% 
+  dplyr::select(-block, -trt_num) %>% 
+  mutate(trt = as.factor(trt)) %>% 
+  mutate(year = as.factor(year)) %>%
+  group_by(year, trt) %>% 
+  summarise(lb_pass_mean = mean(lb_pass_moisture), 
+            lb_ac_mean = mean(lb_ac),
+            bu_ac_mean = mean(bu_ac)) %>% 
+  print(n = Inf)
+by_clean<- by_clean[3:10,]
+  
+# micros 
+bean_micro_totals_YIELD <- micros_set %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_abund = dplyr::select(.,5:43) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  dplyr::select(date, crop, plot, trt, total_abund) %>% 
+  filter(crop == 'beans') %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year) %>% 
+  dplyr::select(-date) %>% 
+  group_by(year, trt) %>% 
+  summarise(avg_abund = mean(total_abund))
+
+bean_micro_totals_YIELD
+
+bean_yield_abundance <- cbind(bean_micro_totals_YIELD, by_clean)
+bean_yield_abundance <- bean_yield_abundance %>% 
+  rename(year = year...4, 
+         trt = trt...2) %>% 
+  dplyr::select(-year...1, - trt...5) %>% 
+  relocate(year, trt) %>% 
+  print( n = Inf)
+
+
+bb_yield_abund <- glm(bu_ac_mean ~ avg_abund,
+                      data = bean_yield_abundance)
+hist(residuals(bb_yield_abund))
+summary(bb_yield_abund)
+
+ggplot(bean_yield_abundance, aes(x = avg_abund, y = bu_ac_mean))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  #geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02", "#E7298A","#7570B3", "#1B9E77"))+
+  labs(title = "Soybean: Yield ~ Micro abundance",
+       subtitle = "Years: 2022-2023",
+       y = 'Average bu/ac',
+       x = 'Average micro abundance')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+bb_abund_yield <- glm(avg_abund ~ bu_ac_mean,
+                      data = bean_yield_abundance)
+hist(residuals(bb_abund_yield))
+summary(bb_abund_yield)
+
+ggplot(bean_yield_abundance, aes(x = bu_ac_mean, y = avg_abund))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  #geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02","#E7298A" ,"#7570B3", "#1B9E77"))+
+  labs(title = "Soybean: Micro abundance ~ Yield",
+       subtitle = "Years: 2022-2023",
+       y = 'Average micro abundance',
+       x = 'Average bu/ac')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+
+
+# old code unsure of 2/22/2024 ####
 # need to rethink these dfs for the model 1/20/2024
 # this needs to be average population by year match the yield df
 micro_model_df <- micros_set %>%
@@ -990,12 +1181,7 @@ yield %>%
   mutate(year = as.factor(year)) %>%
   print(n = Inf)
   
-  
-  
 
-
-# #ymp1 <- glmer.nb(bu_ac_mean ~ avg_abund + (1|year), 
-#              data = new_yield_abundance)
 
 ###
 ##
