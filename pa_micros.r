@@ -686,15 +686,34 @@ new_micro_cc <- new_micro_cc %>%
   relocate(year, trt) %>% 
   filter(trt != "Check")
 
-ggplot(new_micro_cc, aes(x = cc_mean, y = mean_score_yr, label = year))+
+
+cc_score_cc_aov <- glm(mean_score_yr ~ cc_mean, data = new_micro_cc)
+summary(cc_score_cc_aov)
+hist(residuals(cc_score_cc_aov))
+
+
+ggplot(new_micro_cc, aes(x = cc_mean, y = mean_score_yr))+
   geom_point(aes(color = trt, shape = year),size = 6)+
-  geom_smooth(method = 'lm') + 
-  scale_color_manual(values = c('brown', 'tan', 'green'))+
-  geom_text(vjust = -1, aes(fontface = 'bold'))+
-  guides(shape = FALSE)+
-  labs(title = "Micro scores x CC biomass and year", 
-       y = 'Average micro scores',
-       x = 'Average cc biomass (g)')
+  geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
+  labs(title = "Corn: QBS Scores ~ CC biomass",
+       subtitle = "Years: 2021-2023",
+       y = 'Average QBS scores',
+       x = 'Average cc biomass (g)')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+  annotate("text", x = 35, y = 115, label = "p = 0.001583 **", size = 8)
+
 
 ggplot(filter(new_micro_cc, year == "2021"), aes(x = cc_mean , y = mean_score_yr))+
   geom_point(aes(color = trt), size = 6)+
@@ -765,8 +784,35 @@ new_micro_bcc <- cbind(bcc_clean, bean_micros_yr) %>%
   rename(trt = trt...2,
          year = year...1) %>% 
   dplyr::select(-trt...7,
-                -year...6)
+                -year...6) %>% 
+  mutate(trt = case_when(trt == "br" ~ "Brown",
+                         trt == "grbr" ~ "Gr-Br",
+                         trt == "gr" ~ "Green"))
 
+ggplot(new_micro_bcc, aes(x = cc_mean, y = mean_score_yr))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  #geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"))+
+  labs(title = "Soybean: QBS Scores ~ CC biomass",
+       subtitle = "Years: 2022-2023",
+       y = 'Average QBS scores',
+       x = 'Average cc biomass (g)')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+bb_score_cc_ <- glm(mean_score_yr ~ cc_mean, data = new_micro_bcc)
+summary(bb_score_cc_)
+hist(residuals(bb_score_cc_))
 
 ggplot(new_micro_bcc, aes(x = mean_score_yr, y = cc_mean, label = year))+
   geom_point(aes(color = trt, shape = year),size = 6)+
@@ -959,7 +1005,7 @@ ggplot(new_total_bcc, aes(x = cc_mean, y = avg_abund))+
 ##
 #
 
-# yield x micro pops ####
+# yield x micro abundance ####
 
 # Corn 
 
@@ -1152,26 +1198,103 @@ ggplot(bean_yield_abundance, aes(x = bu_ac_mean, y = avg_abund))+
 
 
 
-# old code unsure of 2/22/2024 ####
-# need to rethink these dfs for the model 1/20/2024
-# this needs to be average population by year match the yield df
-micro_model_df <- micros_set %>%
-  filter(crop == 'corn') %>% 
+# yield x micro scores ####
+
+# beans
+# need check
+
+bean_micro_scores_YIELD <- micro_scores %>% 
   relocate(date, crop, plot, trt) %>% 
-  mutate(total_abund = dplyr::select(.,5:43) %>% 
+  mutate(total_score = dplyr::select(.,5:33) %>% 
            rowSums(na.rm = TRUE)) %>% 
-  dplyr::select(date, crop, plot, trt, total_abund) %>% 
   mutate(block = case_when(plot %in% c(101,102,103,104) ~ 1,
                            plot %in% c(201,202,203,204) ~ 2, 
                            plot %in% c(301,302,303,304) ~ 3, 
                            plot %in% c(401,402,403,404) ~ 4,
                            plot %in% c(501,502,503,504) ~ 5)) %>% 
-  relocate(date, block) %>% 
+  relocate(date, crop, plot, trt, block) %>% 
+  mutate(block = as.factor(block)) %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year, total_score) %>% 
+  dplyr::select(-date) %>% 
+  group_by(year, trt, crop) %>% 
+  summarise(mean_score_yr = mean(total_score)) %>% 
+  filter(crop == 'beans') %>% 
+  dplyr::select(-crop) %>% 
   print(n = Inf)
 
-#yield_model_df
-yield %>% 
-  dplyr::select(-trt_num, -crop) %>% 
+by_clean <- bean_yield %>% 
+  dplyr::select(-block, -trt_num) %>% 
+  mutate(trt = as.factor(trt)) %>% 
+  mutate(year = as.factor(year)) %>%
+  group_by(year, trt) %>% 
+  summarise(lb_pass_mean = mean(lb_pass_moisture), 
+            lb_ac_mean = mean(lb_ac),
+            bu_ac_mean = mean(bu_ac)) %>% 
+  print(n = Inf)
+by_clean<- by_clean[3:10,]
+
+bean_yield_scores <- cbind(bean_micro_scores_YIELD, by_clean)
+bean_yield_scores <- bean_yield_scores %>% 
+  rename(year = year...4, 
+         trt = trt...2) %>% 
+  dplyr::select(-year...1, - trt...5) %>% 
+  relocate(year, trt) %>% 
+  print( n = Inf)
+
+
+bb_scoresXyield <- glm(bu_ac_mean ~ mean_score_yr, data = bean_yield_scores)
+hist(residuals(bb_scoresXyield))
+summary(bb_scoresXyield)
+
+
+ggplot(bean_yield_scores, aes(x = mean_score_yr, y = bu_ac_mean))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  #geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02", "#E7298A","#7570B3", "#1B9E77"))+
+  labs(title = "Soybean: Yield ~ QBS Scores",
+       subtitle = "Years: 2022-2023",
+       y = 'Average bu/ac',
+       x = 'Average QBS scores')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+# corn 
+# need check
+
+corn_micro_scores_YIELD <- micro_scores %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_score = dplyr::select(.,5:33) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  mutate(block = case_when(plot %in% c(101,102,103,104) ~ 1,
+                           plot %in% c(201,202,203,204) ~ 2, 
+                           plot %in% c(301,302,303,304) ~ 3, 
+                           plot %in% c(401,402,403,404) ~ 4,
+                           plot %in% c(501,502,503,504) ~ 5)) %>% 
+  relocate(date, crop, plot, trt, block) %>% 
+  mutate(block = as.factor(block)) %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year, total_score) %>% 
+  dplyr::select(-date) %>% 
+  group_by(year, trt, crop) %>% 
+  summarise(mean_score_yr = mean(total_score)) %>% 
+  filter(crop == 'corn') %>% 
+  dplyr::select(-crop) %>% 
+  print(n = Inf)
+
+yield_clean <- yield %>% 
+  dplyr::select(-block, -trt_num, -crop) %>% 
   mutate(trt = as.factor(trt)) %>% 
   mutate(year = as.factor(year)) %>%
   group_by(year, trt) %>% 
@@ -1180,12 +1303,41 @@ yield %>%
             bu_ac_mean = mean(bu_ac)) %>% 
   mutate(year = as.factor(year)) %>%
   print(n = Inf)
-  
 
+corn_yield_scores <- cbind(corn_micro_scores_YIELD, yield_clean)
+corn_yield_scores <- corn_yield_scores %>% 
+  rename(year = year...4, 
+         trt = trt...2) %>% 
+  dplyr::select(-year...1, - trt...5) %>% 
+  relocate(year, trt) %>% 
+  print( n = Inf)
 
-###
-##
-#
+cc_scoresXyield <- glm(bu_ac_mean ~ mean_score_yr, data = corn_yield_scores)
+hist(residuals(cc_scoresXyield))
+summary(cc_scoresXyield)
+
+ggplot(corn_yield_scores, aes(x = mean_score_yr, y = bu_ac_mean))+
+  geom_point(aes(color = trt, shape = year),size = 6)+
+  geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+  stat_poly_eq(label.x = "left", label.y = "top", size = 8)+
+  scale_color_manual(values = c("#D95F02", "#E7298A","#7570B3", "#1B9E77"))+
+  labs(title = "Corn: Yield ~ QBS Scores",
+       subtitle = "Years: 2021-2023",
+       y = 'Average bu/ac',
+       x = 'Average QBS scores')+
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 18),
+        axis.title = element_text(size = 20),
+        plot.title = element_text(size = 24),
+        plot.subtitle = element_text(size = 18),
+        axis.line = element_line(size = 1.25),
+        axis.ticks = element_line(size = 1.25),
+        axis.ticks.length = unit(.25, "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+  annotate("text", x = 40, y = 245, label = "p = 0.000664 ***", size = 8)
+
 
 # permanova ####
 # need different values here
