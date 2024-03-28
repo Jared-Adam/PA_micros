@@ -1,0 +1,201 @@
+Year,Crop,CropYear,CC,BrownPlot,GreenBrownPlot,GreenPlot,BrownInt,GreenBrownInt,GreenInt,Interaction,CC.win,Split,Herb,Plot,Obs_ID,Block,YieldData,YieldBuac,Rye.kgha,WeedUnit,UTC.tot.density.siteyear,UTC.dic.density.siteyear,UTC.mon.density.siteyear,UTC.erica.density.siteyear,TOTAL_den,DICOT_den,GRASS_den,AMACH_den,CHEAL_den,ERICA_den,OtherDicot_den,SEDGE_den,Response,AMACH_bio_g,CHEAL_bio_g,ERICA_bio_g,BL_bio_g,GRASS_bio_g,SEDGE_bio_g
+2022,soybean,soybean (2022),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,102,obs3,B1,no,na,2398,2 sqm,92,79,13,30,99,96,3,0,1,52,43,9,Biomass,0,0.006,12.85,6.08,0.074,0.73
+2022,soybean,soybean (2022),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,201,obs9,B2,no,na,2316,2 sqm,92,79,13,30,13,13,0,0,0,2,11,0,Biomass,0,0,0.44,0.59,0,0
+2022,soybean,soybean (2022),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,303,obs21,B3,no,na,3548,2 sqm,92,79,13,30,46,46,0,13,4,1,28,0,Biomass,2.499,0.76,0.078,3.09,0,0
+2022,soybean,soybean (2022),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,402,obs27,B4,no,na,3002,2 sqm,92,79,13,30,22,18,4,4,1,1,12,0,Biomass,1.182,1.01,0.027,1.94,0.16,0
+2022,soybean,soybean (2022),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,502,obs35,B5,no,na,3580,2 sqm,92,79,13,30,76,75,1,8,10,3,54,0,Biomass,1.36,1.2,1.05,1.21,0,0
+2021,corn,corn (2021),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,102,obs43,B1,no,na,5375,2 sqm,48,46,1,na,21,21,0,na,na,na,21,0,Biomass,na,na,na,0.54,0,0
+2021,corn,corn (2021),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,201,obs49,B2,no,na,5882,2 sqm,48,46,1,na,9,4,5,na,na,na,4,0,Biomass,na,na,na,0.09,0.11,0
+2021,corn,corn (2021),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,303,obs61,B3,no,na,4966,2 sqm,48,46,1,na,6,4,2,na,na,na,4,0,Biomass,na,na,na,0.03,0.21,0
+2021,corn,corn (2021),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,402,obs67,B4,no,na,5313,2 sqm,48,46,1,na,6,6,0,na,na,na,6,0,Biomass,na,na,na,0.12,0,0
+2021,corn,corn (2021),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,502,obs75,B5,no,na,4928,2 sqm,48,46,1,na,4,3,1,na,na,na,3,0,Biomass,na,na,na,0.05,0.75,0
+2022,corn,corn (2022),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,102,obs83,B1,no,na,5334,2 sqm,68,48,20,16,148,32,116,17,0,4,11,35,Biomass,0.54,0,0.05,0.024,5.7,0
+2022,corn,corn (2022),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,201,obs89,B2,no,na,4741,2 sqm,68,48,20,16,12,11,1,1,5,1,4,14,Biomass,0.001,0.235,0.032,0.065,0.011,0
+2022,corn,corn (2022),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,303,obs101,B3,no,na,5456,2 sqm,68,48,20,16,33,8,25,1,4,0,3,11,Biomass,0,0.11,0,0.24,2.63,0
+2022,corn,corn (2022),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,402,obs107,B4,no,na,6285,2 sqm,68,48,20,16,47,11,36,1,6,3,1,14,Biomass,0.027,0.054,0.159,0.072,1.2,0.086
+2022,corn,corn (2022),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,502,obs115,B5,no,na,5638,2 sqm,68,48,20,16,47,9,38,1,3,1,4,12,Biomass,0.081,0.034,0.016,0.054,1.69,0.64
+2023,corn,corn (2023),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,102,obs123,B1,no,na,2370,2 sqm,24,19,5,na,34,34,0,7,7,2,18,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,201,obs129,B2,no,na,1629,2 sqm,24,19,5,na,19,17,2,5,3,3,6,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,303,obs141,B3,no,na,2089,2 sqm,24,19,5,na,22,21,1,5,6,4,6,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,402,obs147,B4,no,na,2475,2 sqm,24,19,5,na,35,35,0,3,5,0,27,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,502,obs155,B5,no,na,2249,2 sqm,24,19,5,na,11,10,1,1,0,2,7,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,102,obs163,B1,no,na,1545,2 sqm,57,55,2,45,20,16,4,2,1,1,12,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,201,obs169,B2,no,na,1726,2 sqm,57,55,2,45,11,11,0,3,2,3,3,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,303,obs181,B3,no,na,1770,2 sqm,57,55,2,45,19,18,1,1,8,3,6,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,402,obs187,B4,no,na,1750,2 sqm,57,55,2,45,28,28,0,3,1,5,19,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),1-3 DAP,no,no,yes,no,no,yes,CC,21,Weedy,UTC,502,obs195,B5,no,na,1960,2 sqm,57,55,2,45,25,8,17,0,0,2,6,0,Biomass,na,na,na,na,na,na
+2022,soybean,soybean (2022),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,103,obs5,B1,no,na,459,2 sqm,92,79,13,30,124,123,1,6,12,38,67,13,Biomass,0.243,1.66,7.26,3.07,0.111,1.9
+2022,soybean,soybean (2022),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,204,obs15,B2,no,na,319,2 sqm,92,79,13,30,142,113,29,0,2,4,107,0,Biomass,0,1.19,2.84,12.67,4.17,0
+2022,soybean,soybean (2022),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,302,obs19,B3,no,na,559,2 sqm,92,79,13,30,190,180,10,0,73,69,38,0,Biomass,0,14.52,36,7.72,0.418,0
+2022,soybean,soybean (2022),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,403,obs29,B4,no,na,506,2 sqm,92,79,13,30,34,34,0,2,1,7,24,0,Biomass,5.1,0.258,2.241,2.86,0,0
+2022,soybean,soybean (2022),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,501,obs33,B5,no,na,240,2 sqm,92,79,13,30,110,48,62,8,6,6,28,0,Biomass,0.188,0.399,3.58,2.1,6.56,0
+2021,corn,corn (2021),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,103,obs45,B1,no,na,1628,2 sqm,48,46,1,na,8,8,0,na,na,na,8,0,Biomass,na,na,na,0.07,0,0
+2021,corn,corn (2021),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,204,obs55,B2,no,na,1628,2 sqm,48,46,1,na,62,57,5,na,na,na,57,0,Biomass,na,na,na,1.14,0.08,0
+2021,corn,corn (2021),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,302,obs59,B3,no,na,1673,2 sqm,48,46,1,na,54,50,4,na,na,na,50,0,Biomass,na,na,na,1.21,0.06,0
+2021,corn,corn (2021),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,403,obs69,B4,no,na,1699,2 sqm,48,46,1,na,34,27,2,na,na,na,27,5,Biomass,na,na,na,0.89,0.03,0.96
+2021,corn,corn (2021),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,501,obs73,B5,no,na,2456,2 sqm,48,46,1,na,2,2,0,na,na,na,2,0,Biomass,na,na,na,0.18,0,0
+2022,corn,corn (2022),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,103,obs85,B1,no,na,1292,2 sqm,68,48,20,16,91,39,52,6,0,6,27,42,Biomass,4.01,0,1.6,1.1,11.31,0
+2022,corn,corn (2022),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,204,obs95,B2,no,na,1090,2 sqm,68,48,20,16,127,57,70,1,3,7,46,60,Biomass,0.073,0.76,4.03,2.7,14.87,0
+2022,corn,corn (2022),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,302,obs99,B3,no,na,920,2 sqm,68,48,20,16,66,41,25,8,7,1,25,44,Biomass,1.13,0.694,0.068,1.28,11.44,0
+2022,corn,corn (2022),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,403,obs109,B4,no,na,1368,2 sqm,68,48,20,16,56,41,15,11,4,3,23,44,Biomass,4.19,0.72,1.99,3.75,3.09,0
+2022,corn,corn (2022),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,501,obs113,B5,no,na,1158,2 sqm,68,48,20,16,97,87,10,12,64,7,4,90,Biomass,1.55,8.6,5.74,1,4.21,0
+2023,corn,corn (2023),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,103,obs125,B1,no,na,656,2 sqm,24,19,5,na,66,63,3,11,13,1,38,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,204,obs135,B2,no,na,595,2 sqm,24,19,5,na,47,47,0,13,21,1,12,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,302,obs139,B3,no,na,616,2 sqm,24,19,5,na,7,7,0,5,1,0,1,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,403,obs149,B4,no,na,554,2 sqm,24,19,5,na,25,21,4,5,2,0,14,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,501,obs153,B5,no,na,772,2 sqm,24,19,5,na,11,9,2,6,3,0,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,103,obs165,B1,no,na,859,2 sqm,57,55,2,45,38,33,5,10,5,3,15,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,204,obs175,B2,no,na,807,2 sqm,57,55,2,45,36,35,1,11,12,5,7,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,302,obs179,B3,no,na,886,2 sqm,57,55,2,45,24,24,0,2,0,21,1,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,403,obs189,B4,no,na,905,2 sqm,57,55,2,45,34,33,1,5,3,13,12,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),14-21 DPP,yes,no,no,yes,no,no,CC,0,Weedy,UTC,501,obs193,B5,no,na,905,2 sqm,57,55,2,45,27,27,0,2,0,25,0,0,Biomass,na,na,na,na,na,na
+2022,soybean,soybean (2022),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,104,obs7,B1,no,na,1305,2 sqm,92,79,13,30,81,76,5,12,7,9,48,0,Biomass,0.97,0.97,1.3,3.56,0.59,0
+2022,soybean,soybean (2022),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,202,obs11,B2,no,na,2010,2 sqm,92,79,13,30,149,149,0,2,17,3,127,0,Biomass,0.161,5.473,2.646,8.56,0,0
+2022,soybean,soybean (2022),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,301,obs17,B3,no,na,1397,2 sqm,92,79,13,30,23,20,3,2,6,0,12,0,Biomass,0.32,1.085,0,1.38,1.04,0
+2022,soybean,soybean (2022),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,404,obs31,B4,no,na,2007,2 sqm,92,79,13,30,24,19,5,4,2,0,13,0,Biomass,0.5,0.056,0,0.483,0.34,0
+2022,soybean,soybean (2022),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,504,obs39,B5,no,na,1944,2 sqm,92,79,13,30,60,43,17,4,9,3,27,0,Biomass,0.721,1.552,0.622,2.63,3.45,0
+2021,corn,corn (2021),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,104,obs47,B1,no,na,2901,2 sqm,48,46,1,na,11,4,7,na,na,na,4,0,Biomass,na,na,na,0.05,0.18,0
+2021,corn,corn (2021),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,202,obs51,B2,no,na,3577,2 sqm,48,46,1,na,39,38,1,na,na,na,38,0,Biomass,na,na,na,0.63,0,0
+2021,corn,corn (2021),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,301,obs57,B3,no,na,3488,2 sqm,48,46,1,na,21,19,0,na,na,na,19,2,Biomass,na,na,na,2.26,0,0.3
+2021,corn,corn (2021),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,404,obs71,B4,no,na,2536,2 sqm,48,46,1,na,23,15,8,na,na,na,15,0,Biomass,na,na,na,0.26,0.31,0
+2021,corn,corn (2021),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,504,obs79,B5,no,na,2652,2 sqm,48,46,1,na,26,9,17,na,na,na,9,0,Biomass,na,na,na,0.33,0.62,0
+2022,corn,corn (2022),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,104,obs87,B1,no,na,3163,2 sqm,68,48,20,16,116,51,65,29,0,9,13,54,Biomass,4.73,0,0.166,0.516,6.03,0
+2022,corn,corn (2022),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,202,obs91,B2,no,na,2695,2 sqm,68,48,20,16,32,10,22,4,0,1,5,13,Biomass,0.313,0,0.21,0.078,5.8,0
+2022,corn,corn (2022),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,301,obs97,B3,no,na,2500,2 sqm,68,48,20,16,19,19,0,2,3,0,14,22,Biomass,0.484,1.187,0,0.672,0,0
+2022,corn,corn (2022),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,404,obs111,B4,no,na,2748,2 sqm,68,48,20,16,62,22,40,2,0,13,7,25,Biomass,0.132,0,0.95,0.144,4.4,0
+2022,corn,corn (2022),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,504,obs119,B5,no,na,2678,2 sqm,68,48,20,16,51,28,23,9,10,5,4,31,Biomass,1.5,1.12,1.39,0.063,4.96,0
+2023,corn,corn (2023),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,104,obs127,B1,no,na,1433,2 sqm,24,19,5,na,27,26,1,15,8,1,2,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,202,obs131,B2,no,na,1490,2 sqm,24,19,5,na,37,37,0,11,6,0,20,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,301,obs137,B3,no,na,2160,2 sqm,24,19,5,na,5,4,1,3,0,0,1,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,404,obs151,B4,no,na,2154,2 sqm,24,19,5,na,8,8,0,5,2,1,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,504,obs159,B5,no,na,1490,2 sqm,24,19,5,na,1,1,0,1,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,104,obs167,B1,no,na,784,2 sqm,57,55,2,45,44,37,7,9,9,12,7,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,202,obs171,B2,no,na,2088,2 sqm,57,55,2,45,20,19,1,5,4,0,10,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,301,obs177,B3,no,na,2032,2 sqm,57,55,2,45,20,19,1,5,4,9,1,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,404,obs191,B4,no,na,2229,2 sqm,57,55,2,45,12,11,1,3,1,7,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),3-7 DPP,no,yes,no,no,yes,no,CC,14,Weedy,UTC,504,obs199,B5,no,na,1661,2 sqm,57,55,2,45,21,19,2,1,0,18,0,0,Biomass,na,na,na,na,na,na
+2022,soybean,soybean (2022),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,101,obs1,B1,no,na,0,2 sqm,92,79,13,30,98,96,2,5,10,77,4,0,Biomass,0.94,4.01,25.21,0.323,0.299,0
+2022,soybean,soybean (2022),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,203,obs13,B2,no,na,0,2 sqm,92,79,13,30,93,93,0,1,15,3,74,0,Biomass,0.027,23.87,4.55,5.1,0,0
+2022,soybean,soybean (2022),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,304,obs23,B3,no,na,0,2 sqm,92,79,13,30,100,76,24,2,4,35,35,0,Biomass,0.346,0.7,16.71,2.009,3.043,0
+2022,soybean,soybean (2022),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,401,obs25,B4,no,na,0,2 sqm,92,79,13,30,80,56,24,16,4,4,32,0,Biomass,3.81,0.181,3.31,5.03,10.06,0
+2022,soybean,soybean (2022),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,503,obs37,B5,no,na,0,2 sqm,92,79,13,30,89,74,15,6,9,30,29,0,Biomass,1.394,1.412,24.27,2.666,3.353,0
+2021,corn,corn (2021),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,101,obs41,B1,no,na,0,2 sqm,48,46,1,na,18,17,1,na,na,na,17,0,Biomass,na,na,na,0.78,0,0
+2021,corn,corn (2021),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,203,obs53,B2,no,na,0,2 sqm,48,46,1,na,70,70,0,na,na,na,70,0,Biomass,na,na,na,17.46,0,0
+2021,corn,corn (2021),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,304,obs63,B3,no,na,0,2 sqm,48,46,1,na,53,52,1,na,na,na,52,0,Biomass,na,na,na,15.31,0.47,0
+2021,corn,corn (2021),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,401,obs65,B4,no,na,0,2 sqm,48,46,1,na,33,29,4,na,na,na,29,0,Biomass,na,na,na,3.63,0.5,0
+2021,corn,corn (2021),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,503,obs77,B5,no,na,0,2 sqm,48,46,1,na,62,62,0,na,na,na,62,0,Biomass,na,na,na,9.63,0,0
+2022,corn,corn (2022),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,101,obs81,B1,no,na,0,2 sqm,68,48,20,16,60,57,3,4,1,11,41,60,Biomass,0.05,0.12,7.38,3.29,0.052,0
+2022,corn,corn (2022),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,203,obs93,B2,no,na,0,2 sqm,68,48,20,16,41,33,8,2,14,11,6,36,Biomass,0.066,3.71,6.51,1.54,2.57,0
+2022,corn,corn (2022),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,304,obs103,B3,no,na,0,2 sqm,68,48,20,16,72,38,34,2,3,11,22,41,Biomass,0.179,0.41,8.39,1.59,12.19,0
+2022,corn,corn (2022),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,401,obs105,B4,no,na,0,2 sqm,68,48,20,16,74,57,17,0,6,41,10,60,Biomass,0,0.204,22.08,1.37,1.84,0
+2022,corn,corn (2022),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,503,obs117,B5,no,na,0,2 sqm,68,48,20,16,92,56,36,5,20,6,25,59,Biomass,1.12,7.02,16.61,2.79,7.28,0
+2023,corn,corn (2023),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,101,obs121,B1,no,na,0,2 sqm,24,19,5,na,61,40,21,26,6,1,7,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,203,obs133,B2,no,na,0,2 sqm,24,19,5,na,23,23,0,1,2,0,20,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,304,obs143,B3,no,na,0,2 sqm,24,19,5,na,19,19,0,6,7,0,6,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,401,obs145,B4,no,na,0,2 sqm,24,19,5,na,6,5,1,3,1,0,1,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,503,obs157,B5,no,na,0,2 sqm,24,19,5,na,11,9,2,6,2,0,1,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,101,obs161,B1,no,na,0,2 sqm,57,55,2,45,135,130,5,11,2,110,7,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,203,obs173,B2,no,na,0,2 sqm,57,55,2,45,18,18,0,0,2,5,11,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,304,obs183,B3,no,na,0,2 sqm,57,55,2,45,41,40,1,0,4,30,6,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,401,obs185,B4,no,na,0,2 sqm,57,55,2,45,80,80,0,0,0,79,1,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),No CC,yes,yes,yes,no,no,no,CTL,na,Weedy,UTC,503,obs197,B5,no,na,0,2 sqm,57,55,2,45,10,9,1,5,2,1,1,0,Biomass,na,na,na,na,na,na
+2022,soybean,soybean (2022),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,102,obs4,B1,yes,36,2820,2 sqm,92,79,13,30,21,20,1,1,0,2,17,0,Biomass,0,0,2.102,1.09,0.035,0
+2022,soybean,soybean (2022),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,201,obs10,B2,yes,53,1718,2 sqm,92,79,13,30,35,32,3,9,1,0,22,3,Biomass,0.91,0.56,0,5.72,0.21,0
+2022,soybean,soybean (2022),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,303,obs22,B3,yes,47,3651,2 sqm,92,79,13,30,4,4,0,0,0,0,4,0,Biomass,0,0,0,0.34,0,0
+2022,soybean,soybean (2022),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,402,obs28,B4,yes,51,2863,2 sqm,92,79,13,30,13,12,1,0,0,2,10,0,Biomass,0,0,0.43,0.548,0.07,0
+2022,soybean,soybean (2022),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,502,obs36,B5,yes,50,2732,2 sqm,92,79,13,30,31,31,0,9,7,4,11,0,Biomass,1.614,0.44,0.136,0.6,0,0
+2021,corn,corn (2021),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,102,obs44,B1,yes,131,5375,2 sqm,48,46,1,na,1,0,1,na,na,na,0,0,Biomass,na,na,na,0,0.25,0
+2021,corn,corn (2021),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,201,obs50,B2,yes,129,5882,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,303,obs62,B3,yes,106,4966,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,402,obs68,B4,yes,139,5313,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,502,obs76,B5,yes,133,4928,2 sqm,48,46,1,na,2,2,0,na,na,na,2,0,Biomass,na,na,na,0,0,0
+2022,corn,corn (2022),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,102,obs84,B1,yes,123,5334,2 sqm,68,48,20,16,89,2,87,1,0,0,1,5,Biomass,0.13,0,0,0.002,2.45,0
+2022,corn,corn (2022),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,201,obs90,B2,yes,119,4741,2 sqm,68,48,20,16,6,0,6,0,0,0,0,3,Biomass,0,0,0,0,0.121,0
+2022,corn,corn (2022),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,303,obs102,B3,yes,116,5456,2 sqm,68,48,20,16,12,0,12,0,0,0,0,3,Biomass,0,0,0,0,0.34,0
+2022,corn,corn (2022),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,402,obs108,B4,yes,139,6285,2 sqm,68,48,20,16,18,2,16,1,1,0,0,5,Biomass,0.006,0.002,0,0,0.6,0
+2022,corn,corn (2022),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,502,obs116,B5,yes,119,5638,2 sqm,68,48,20,16,10,1,9,0,1,0,0,4,Biomass,0,0.002,0,0,0.15,0
+2023,corn,corn (2023),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,102,obs124,B1,yes,184,2370,2 sqm,24,19,5,na,1,1,0,0,0,1,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,201,obs130,B2,yes,123,1629,2 sqm,24,19,5,na,1,0,1,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,303,obs142,B3,yes,167,2089,2 sqm,24,19,5,na,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,402,obs148,B4,yes,178,2475,2 sqm,24,19,5,na,4,4,0,0,0,0,4,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,502,obs156,B5,yes,192,2249,2 sqm,24,19,5,na,5,5,0,0,0,0,5,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,102,obs164,B1,yes,59,1545,2 sqm,57,55,2,45,2,2,0,0,0,0,2,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,201,obs170,B2,yes,66,1726,2 sqm,57,55,2,45,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,303,obs182,B3,yes,60,1770,2 sqm,57,55,2,45,3,3,0,0,1,0,2,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,402,obs188,B4,yes,68,1750,2 sqm,57,55,2,45,5,4,0,0,0,0,4,1,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),1-3 DAP,no,no,yes,no,no,yes,CC x PRE,21,Weed free,PRE,502,obs196,B5,yes,65,1960,2 sqm,57,55,2,45,4,4,0,0,0,0,4,0,Biomass,na,na,na,na,na,na
+2022,soybean,soybean (2022),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,103,obs6,B1,yes,54,551,2 sqm,92,79,13,30,55,53,2,1,2,11,39,0,Biomass,0.007,0.173,6.56,2.35,0.066,0
+2022,soybean,soybean (2022),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,204,obs16,B2,yes,50,619,2 sqm,92,79,13,30,24,19,5,3,0,0,16,0,Biomass,3.22,0,0,4.08,0.49,0
+2022,soybean,soybean (2022),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,302,obs20,B3,yes,54,435,2 sqm,92,79,13,30,38,36,2,3,2,3,28,0,Biomass,0,6.53,35.28,2.87,0.118,0
+2022,soybean,soybean (2022),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,403,obs30,B4,yes,50,560,2 sqm,92,79,13,30,28,28,0,2,0,2,24,0,Biomass,0.173,0,0.118,0.93,0,0
+2022,soybean,soybean (2022),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,501,obs34,B5,yes,42,444,2 sqm,92,79,13,30,44,42,2,3,10,6,23,0,Biomass,0.85,0.86,1.353,4.62,0.083,0
+2021,corn,corn (2021),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,103,obs46,B1,yes,139,1628,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,204,obs56,B2,yes,144,1628,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,302,obs60,B3,yes,136,1673,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,403,obs70,B4,yes,154,1699,2 sqm,48,46,1,na,2,2,0,na,na,na,2,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,501,obs74,B5,yes,151,2456,2 sqm,48,46,1,na,1,1,0,na,na,na,1,0,Biomass,na,na,na,0,0,0
+2022,corn,corn (2022),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,103,obs86,B1,yes,134,1292,2 sqm,68,48,20,16,97,10,87,8,0,0,2,13,Biomass,0.269,0,0,0.008,3.78,0
+2022,corn,corn (2022),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,204,obs96,B2,yes,131,1090,2 sqm,68,48,20,16,10,2,8,0,0,0,2,5,Biomass,0,0,0,0,1.24,0
+2022,corn,corn (2022),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,302,obs100,B3,yes,124,920,2 sqm,68,48,20,16,25,1,24,1,0,0,0,4,Biomass,0.015,0,0,0,10.98,0
+2022,corn,corn (2022),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,403,obs110,B4,yes,131,1368,2 sqm,68,48,20,16,41,1,40,0,0,0,1,4,Biomass,0,0,0,0.004,2.72,0
+2022,corn,corn (2022),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,501,obs114,B5,yes,137,1158,2 sqm,68,48,20,16,8,5,3,2,3,0,0,8,Biomass,0.005,0.038,0,0,0.202,0
+2023,corn,corn (2023),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,103,obs126,B1,yes,149,656,2 sqm,24,19,5,na,9,5,4,0,0,0,5,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,204,obs136,B2,yes,144,595,2 sqm,24,19,5,na,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,302,obs140,B3,yes,147,616,2 sqm,24,19,5,na,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,403,obs150,B4,yes,166,554,2 sqm,24,19,5,na,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,501,obs154,B5,yes,106,772,2 sqm,24,19,5,na,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,103,obs166,B1,yes,35,859,2 sqm,57,55,2,45,10,5,5,0,0,0,5,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,204,obs176,B2,yes,63,807,2 sqm,57,55,2,45,4,4,0,0,0,4,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,302,obs180,B3,yes,65,886,2 sqm,57,55,2,45,1,0,1,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,403,obs190,B4,yes,70,905,2 sqm,57,55,2,45,1,1,0,0,1,0,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),14-21 DPP,yes,no,no,yes,no,no,CC x PRE,0,Weed free,PRE,501,obs194,B5,yes,61,905,2 sqm,57,55,2,45,10,10,0,0,0,9,1,0,Biomass,na,na,na,na,na,na
+2022,soybean,soybean (2022),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,104,obs8,B1,yes,53,1700,2 sqm,92,79,13,30,20,13,7,4,0,1,8,0,Biomass,3.28,0,0.032,0.158,1.36,0
+2022,soybean,soybean (2022),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,202,obs12,B2,yes,54,1528,2 sqm,92,79,13,30,39,39,0,1,1,2,35,0,Biomass,1.57,0.204,0.476,2.87,0,0
+2022,soybean,soybean (2022),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,301,obs18,B3,yes,30,527,2 sqm,92,79,13,30,8,7,1,0,2,0,5,0,Biomass,0,0.45,0,0.474,0.98,0
+2022,soybean,soybean (2022),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,404,obs32,B4,yes,53,2285,2 sqm,92,79,13,30,6,4,2,0,0,1,3,0,Biomass,0,0,0.167,0.356,0.145,0
+2022,soybean,soybean (2022),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,504,obs40,B5,yes,48,2339,2 sqm,92,79,13,30,42,32,10,9,4,0,19,0,Biomass,4.36,1.27,0,1.071,1.92,0
+2021,corn,corn (2021),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,104,obs48,B1,yes,147,2901,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,202,obs52,B2,yes,135,3577,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,301,obs58,B3,yes,128,3488,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,404,obs72,B4,yes,153,2536,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,504,obs80,B5,yes,142,2652,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2022,corn,corn (2022),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,104,obs88,B1,yes,124,3163,2 sqm,68,48,20,16,26,3,23,0,1,0,2,6,Biomass,0,0.008,0,0.013,1.48,0
+2022,corn,corn (2022),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,202,obs92,B2,yes,134,2695,2 sqm,68,48,20,16,6,0,6,0,0,0,0,3,Biomass,0,0,0,0,0.77,0
+2022,corn,corn (2022),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,301,obs98,B3,yes,134,2500,2 sqm,68,48,20,16,3,2,1,0,0,0,2,5,Biomass,0,0,0,0.017,0.07,0
+2022,corn,corn (2022),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,404,obs112,B4,yes,132,2748,2 sqm,68,48,20,16,18,1,17,1,0,0,0,4,Biomass,0.01,0,0,0,2.46,0
+2022,corn,corn (2022),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,504,obs120,B5,yes,132,2678,2 sqm,68,48,20,16,16,1,15,1,0,0,0,4,Biomass,0.028,0,0,0,1.23,0
+2023,corn,corn (2023),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,104,obs128,B1,yes,139,1433,2 sqm,24,19,5,na,8,8,0,0,0,6,2,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,202,obs132,B2,yes,172,1490,2 sqm,24,19,5,na,3,3,0,0,0,0,3,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,301,obs138,B3,yes,122,2160,2 sqm,24,19,5,na,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,404,obs152,B4,yes,153,2154,2 sqm,24,19,5,na,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,504,obs160,B5,yes,139,1490,2 sqm,24,19,5,na,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,104,obs168,B1,yes,65,784,2 sqm,57,55,2,45,8,7,1,0,1,4,2,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,202,obs172,B2,yes,61,2088,2 sqm,57,55,2,45,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,301,obs178,B3,yes,63,2032,2 sqm,57,55,2,45,1,1,0,0,0,1,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,404,obs192,B4,yes,23,2229,2 sqm,57,55,2,45,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),3-7 DPP,no,yes,no,no,yes,no,CC x PRE,14,Weed free,PRE,504,obs200,B5,yes,62,1661,2 sqm,57,55,2,45,0,0,0,0,0,0,0,,Biomass,na,na,na,na,na,na
+2022,soybean,soybean (2022),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,101,obs2,B1,yes,55,0,2 sqm,92,79,13,30,115,108,7,8,49,36,15,0,Biomass,0.172,4.14,27.12,0.852,0.65,0
+2022,soybean,soybean (2022),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,203,obs14,B2,yes,41,0,2 sqm,92,79,13,30,30,27,3,4,4,1,18,0,Biomass,0.656,0.85,0.095,3.19,0.22,0
+2022,soybean,soybean (2022),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,304,obs24,B3,yes,47,0,2 sqm,92,79,13,30,23,15,8,0,1,1,13,0,Biomass,0,0.123,2.42,2.47,1.41,0
+2022,soybean,soybean (2022),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,401,obs26,B4,yes,50,0,2 sqm,92,79,13,30,34,33,1,5,12,2,14,0,Biomass,0.569,7.016,1.9,1.039,1.45,0
+2022,soybean,soybean (2022),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,503,obs38,B5,yes,45,0,2 sqm,92,79,13,30,30,29,1,6,5,7,11,0,Biomass,0.356,0.636,2.31,4.459,0.075,0
+2021,corn,corn (2021),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,101,obs42,B1,yes,121,0,2 sqm,48,46,1,na,10,10,0,na,na,na,10,0,Biomass,na,na,na,0.4,0,0
+2021,corn,corn (2021),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,203,obs54,B2,yes,102,0,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,304,obs64,B3,yes,141,0,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,401,obs66,B4,yes,130,0,2 sqm,48,46,1,na,0,0,0,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2021,corn,corn (2021),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,503,obs78,B5,yes,139,0,2 sqm,48,46,1,na,1,0,1,na,na,na,0,0,Biomass,na,na,na,0,0,0
+2022,corn,corn (2022),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,101,obs82,B1,yes,112,0,2 sqm,68,48,20,16,29,5,24,0,3,1,1,8,Biomass,0,5.06,0.13,0.24,5.53,0
+2022,corn,corn (2022),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,203,obs94,B2,yes,140,0,2 sqm,68,48,20,16,43,14,29,0,0,0,14,17,Biomass,0,0,0,1.04,9.01,0
+2022,corn,corn (2022),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,304,obs104,B3,yes,81,0,2 sqm,68,48,20,16,17,0,17,0,0,0,0,3,Biomass,0,0,0,0,3.12,0
+2022,corn,corn (2022),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,401,obs106,B4,yes,139,0,2 sqm,68,48,20,16,39,9,30,0,2,1,6,12,Biomass,0,2.43,0.062,2.41,2.87,0
+2022,corn,corn (2022),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,503,obs118,B5,yes,92,0,2 sqm,68,48,20,16,14,0,14,0,0,0,0,3,Biomass,0,0,0,0,2.8,0
+2023,corn,corn (2023),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,101,obs122,B1,yes,97,0,2 sqm,24,19,5,na,7,0,7,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,203,obs134,B2,yes,117,0,2 sqm,24,19,5,na,3,3,0,0,0,0,3,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,304,obs144,B3,yes,133,0,2 sqm,24,19,5,na,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,401,obs146,B4,yes,75,0,2 sqm,24,19,5,na,32,20,12,7,0,1,12,0,Biomass,na,na,na,na,na,na
+2023,corn,corn (2023),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,503,obs158,B5,yes,133,0,2 sqm,24,19,5,na,0,0,0,0,0,0,0,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,101,obs162,B1,yes,50,0,2 sqm,57,55,2,45,40,39,1,0,0,33,6,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,203,obs174,B2,yes,47,0,2 sqm,57,55,2,45,5,5,0,0,0,1,4,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,304,obs184,B3,yes,24,0,2 sqm,57,55,2,45,4,4,0,0,0,3,1,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,401,obs186,B4,yes,63,0,2 sqm,57,55,2,45,70,67,3,2,0,59,6,0,Biomass,na,na,na,na,na,na
+2023,soybean,soybean (2023),No CC,yes,yes,yes,yes,yes,yes,PRE,na,Weed free,PRE,503,obs198,B5,yes,54,0,2 sqm,57,55,2,45,1,1,0,0,0,1,0,0,Biomass,na,na,na,na,na,na
