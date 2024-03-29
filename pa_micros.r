@@ -1808,7 +1808,7 @@ DAP: Days after plant")+
         panel.grid.minor = element_blank(),
         plot.caption = element_text(hjust = 0, size = 20, color = "grey25"))
 
- # yield x micro scores ####
+# yield x micro scores ####
 
 # beans
 # need check
@@ -1977,7 +1977,8 @@ permed_micros <- perm_micros %>%
     ins = sum(Insects),
     mites = sum(mites), 
     non_insect = sum(non_insect)
-  )
+  ) %>% 
+  mutate(date = as.factor(date))
 
 
 colnames(permed_micros)
@@ -1999,21 +2000,44 @@ perm_2 <- adonis2(perm_dist ~ crop, permutations =  999, method = "bray", data =
 perm_2
 
 # this one. Factorial 10 for permutations because I shrank the df so much 
-perm_3 <- adonis2(perm_dist ~ year + crop, permutations = factorial(10), method = "bray", data = permed_micros)
+perm_3 <- adonis2(perm_dist ~ year + date + crop, permutations = factorial(10), method = "bray", data = permed_micros)
 perm_3
+# Df SumOfSqs      R2      F    Pr(>F)    
+# year      2   1.3320 0.27930 9.3514 1.102e-06 ***
+# date      3   0.9222 0.19339 4.3166  0.000264 ***
+# crop      1   0.1645 0.03450 2.3105  0.075247 .  
+# Residual 33   2.3502 0.49281                     
+# Total    39   4.7689 1.00000    
 
-# 3/29/2024 this can be replaced with a glm.nb of year
-# I want to look at permnanova between corn 22 and beans 23
+
+
+# comparing populations of the legacy years
+# 2021- 2022
+# can i do this? The collection methods changed a bit 
+# more samples in 2021?
+
+
+# 2022 - 2023
 pc <- permed_micros %>% 
-  filter(crop == "corn" & year == "2022")
+    filter(crop == "corn" & year == "2022")
 pb <- permed_micros %>% 
-  filter(crop == "beans" & year == "2023")
-pc_pb <- rbind(pc, pb)
-pc_pb_pops <- pc_pb[6:32]
+    filter(crop == "beans" & year == "2023")
+pc_pb <- rbind(pc, pb) %>% 
+  mutate(date = as.factor(date))
+pc_pb_pops <- pc_pb[5:8]
 
 pc_pb_dist <- vegdist(pc_pb_pops, method = "bray")
-p1_cb <- adonis2(pc_pb_dist ~ year + trt, permutations = 999, method = "bray", data = pc_pb)
+p1_cb <- adonis2(pc_pb_dist ~ year + date + trt, permutations = factorial(10), method = "bray", data = pc_pb)
 p1_cb
+
+# Df SumOfSqs      R2      F   Pr(>F)   
+# year      1  0.37589 0.25361 8.4090 0.005206 **
+# date      2  0.59521 0.40158 6.6576 0.003338 **
+# trt       3  0.10874 0.07337 0.8109 0.555276   
+# Residual  9  0.40231 0.27144                   
+# Total    15  1.48216 1.00000    
+
+
 
 # nmds ####
 # all data 
@@ -2023,9 +2047,24 @@ nmds1 <- metaMDS(perm_pops, k=3)
 nmds1$stress
 stressplot(nmds1)
 
+# plot 
+
+scores <- scores(nmds1, display = 'sites')
+year_scores <- cbind(as.data.frame(scores), year = permed_micros$year)
+
+# species_df <- as.data.frame(scores(nmds1, dispaly = 'species'))
+# species_df$species <- rownames(species_df)
+
+plot <- plot_ly(year_scores, x = ~NMDS1, y = ~ NMDS2, z = ~NMDS3, color = ~year)
+plot <- plot %>% 
+  add_markers()
+plot
 
 
-# troubhle shooting code ####
+# total population plots ####
+
+
+# trouble shooting code ####
 #seeking complete.cases
 y <- subset(micros_set, !complete.cases(micros_set))
 y
