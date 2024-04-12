@@ -18,6 +18,7 @@ library(plotly)
 library(ggpmisc)
 library(multcomp)
 library(emmeans)
+library(ggrepel)
 
 # data ####
 micros <- CE2_counts
@@ -1617,8 +1618,7 @@ summary(cc_scoresXyield)
 
 # permanova ####
 
-# need different values here
-# eliminate score columns 
+# the values are total counts, not sores
 micros_set
 
 perm_micros <- micros_set %>% 
@@ -1630,11 +1630,6 @@ perm_micros <- micros_set %>%
 colnames(perm_micros)
 
 
-
-
-
-
-# perm 
 test <- perm_micros %>% 
   mutate(colembola = col_20 + col_10 + col_6 + col_4,
          Insects = Enich + hemip + AC + CL + AC + OAC + Psocodea+ Thrips+ sipoopter+hymen+ archaeognatha
@@ -1680,7 +1675,11 @@ functional_scores$species <- rownames(functional_scores)
 
 ggplot(data = scrs, aes(x = NMDS1, y = NMDS2))+
   geom_point(aes(color = date))+
-  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)
+  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)+
+  geom_segment(data = functional_scores, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
+               arrow = arrow(), color = 'grey10', lwd = 0.7)+
+  geom_text_repel(data = functional_scores, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
+                  segment.size = 0.25)
 
 
 # 2021 - 2022
@@ -1712,12 +1711,16 @@ nmds0$stress
 scores <- scores(nmds1, display = 'sites')
 scrs_2122 <- cbind(as.data.frame(scores), date = pc1_pb1$date)
 
-functional_scores <- as.data.frame(scores(nmds1, 'species'))
-functional_scores$species <- rownames(functional_scores)
+functional_scores1 <- as.data.frame(scores(nmds1, 'species'))
+functional_scores1$species <- rownames(functional_scores1)
 
 ggplot(data = scrs_2122, aes(x = NMDS1, y = NMDS2))+
   geom_point(aes(color = date))+
-  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)
+  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)+
+  geom_segment(data = functional_scores1, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
+               arrow = arrow(), color = 'grey10', lwd = 0.7)+
+  geom_text_repel(data = functional_scores1, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
+                  segment.size = 0.25)
 
 
 # 2022 - 2023
@@ -1749,17 +1752,16 @@ nmds0$stress
 scores <- scores(nmds2, display = 'sites')
 scrs_2223 <- cbind(as.data.frame(scores), date = pc_pb$date)
 
-functional_scores <- as.data.frame(scores(nmds2, 'species'))
-functional_scores$species <- rownames(functional_scores)
+functional_scores2 <- as.data.frame(scores(nmds2, 'species'))
+functional_scores2$species <- rownames(functional_scores2)
 
 ggplot(data = scrs_2223, aes(x = NMDS1, y = NMDS2))+
   geom_point(aes(color = date))+
-  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)
-
-
-
-
-
+  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)+
+  geom_segment(data = functional_scores2, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
+               arrow = arrow(), color = 'grey10', lwd = 0.7)+
+  geom_text_repel(data = functional_scores2, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
+                  segment.size = 0.25)
 
 
 # 4/12/2024: not using this anymore, this made the df too small
@@ -1815,13 +1817,6 @@ ggplot(data = scrs_2223, aes(x = NMDS1, y = NMDS2))+
 # 2021- 2022
 # can i do this? The collection methods changed a bit 
 # more samples in 2021?
-
-
-     
-
-
-
-
 
 # nmds ####
 # all data 
