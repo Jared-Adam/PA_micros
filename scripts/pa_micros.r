@@ -1629,84 +1629,12 @@ perm_micros <- micros_set %>%
   mutate(year = as.factor(year))
 colnames(perm_micros)
 
-permed_micros <- perm_micros %>% 
-  mutate(colembola = col_20 + col_10 + col_6 + col_4,
-         Insects = Enich + hemip + AC + CL + AC + OAC + Psocodea+ Thrips+ sipoopter+hymen+ archaeognatha
-         + dermaptera + lep+ Formicid + Coccomorpha+a_dipt + OL,
-         mites = Orb + Norb,
-         non_insect = spider + Pseu + Annelid+ protura + simphyla+pauropoda +Diplura +`Chil>5` + `Chil<5`+`Dip>5` + `Dip<5`) %>% 
-  dplyr::select(-japy, - camp, -`Dip>5`, -`Dip<5`, -`Chil>5`, -`Chil<5`,
-                -col_20, -col_10, -col_6, -col_4, -Enich, -hemip, -sym, -pod, -ento, -Iso) %>% 
-  dplyr::select(-Orb, -Norb, -spider, -Pseu, -CL, -OL, -OAC, -a_dipt, -AC, - Coccomorpha, -Psocodea, -Thrips, -simphyla, 
-                -pauropoda, -sipoopter, -Annelid, -protura, -hymen, -Formicid, -archaeognatha, -dermaptera, -lep, -Diplura) %>% 
-  replace(is.na(.),0) %>% 
-  mutate_at(vars(6:9), as.numeric) %>% 
-  mutate(trt = as.factor(trt)) %>% 
-  group_by(year, crop, date, trt) %>% 
-  summarise(
-    col = sum(colembola),
-    ins = sum(Insects),
-    mites = sum(mites), 
-    non_insect = sum(non_insect)
-  ) %>% 
-  mutate(date = as.factor(date))
 
-
-colnames(permed_micros)
 
 
 
 
 # perm 
-
-perm_pops <- permed_micros[5:8]
-
-perm_dist <- vegdist(perm_pops, "bray")
-
-
-perm_1 <- adonis2(perm_dist ~ trt, permutations = 999, method = "bray", data = permed_micros)
-perm_1
-
-perm_2 <- adonis2(perm_dist ~ crop, permutations =  999, method = "bray", data = permed_micros)
-perm_2
-
-# this one. Factorial 10 for permutations because I shrank the df so much 
-perm_3 <- adonis2(perm_dist ~ year + date + crop, permutations = factorial(10), method = "bray", data = permed_micros)
-perm_3
-# Df SumOfSqs      R2      F    Pr(>F)    
-# year      2   0.5580 0.13967 3.9173  0.001725 ** 
-#   date      3   0.9222 0.23085 4.3166 9.425e-05 ***
-#   crop      1   0.1645 0.04119 2.3105  0.068170 .  
-# Residual 33   2.3502 0.58829                     
-# Total    39   3.9949 1.00000    
-
-
-
-# comparing populations of the legacy years
-# 2021- 2022
-# can i do this? The collection methods changed a bit 
-# more samples in 2021?
-
-
-# 2022 - 2023
-pc <- permed_micros %>% 
-    filter(crop == "corn" & year == "2022")
-pb <- permed_micros %>% 
-    filter(crop == "beans" & year == "2023")
-pc_pb <- rbind(pc, pb) %>% 
-  mutate(date = as.factor(date))
-pc_pb_pops <- pc_pb[5:8]
-
-pc_pb_dist <- vegdist(pc_pb_pops, method = "bray")
-p1_cb <- adonis2(pc_pb_dist ~ year + date + trt, permutations = factorial(10), method = "bray", data = pc_pb)
-p1_cb
-
-# year      1  0.37589 0.25361 8.4090 0.005146 **
-#   date      2  0.59521 0.40158 6.6576 0.003352 **
-#   trt       3  0.10874 0.07337 0.8109 0.555304   
-# Residual  9  0.40231 0.27144                   
-# Total    15  1.48216 1.00000      
-
 test <- perm_micros %>% 
   mutate(colembola = col_20 + col_10 + col_6 + col_4,
          Insects = Enich + hemip + AC + CL + AC + OAC + Psocodea+ Thrips+ sipoopter+hymen+ archaeognatha
@@ -1730,15 +1658,168 @@ test_new <- test %>%
 test_pops <- test_new[6:9]
 
 huh <- vegdist(test_pops, method = 'bray')
-perm_3 <- adonis2(huh ~ year + date + crop, permutations = factorial(10), method = "bray", data = test_new)
+perm_3 <- adonis2(huh ~ year + date + crop, permutations = 999, method = "bray", data = test_new)
 perm_3
+# Df SumOfSqs      R2      F Pr(>F)    
+# year       2    1.834 0.04896 5.3061  0.001 ***
+#   date       3    3.427 0.09150 6.6106  0.001 ***
+#   crop       1    0.570 0.01522 3.2992  0.013 *  
+#   Residual 183   31.626 0.84432                  
+# Total    189   37.458 1.00000  
 
-
-
-
-nmds0 <- metaMDS(tester, k = 2)
+nmds0 <- metaMDS(test_pops, k = 2)
 stressplot(nmds0)
 nmds0$stress
+
+scores <- scores(nmds0, display = 'sites')
+scrs <- cbind(as.data.frame(scores), date = test_new$date)
+
+functional_scores <- as.data.frame(scores(nmds0, 'species'))
+functional_scores$species <- rownames(functional_scores)
+
+
+ggplot(data = scrs, aes(x = NMDS1, y = NMDS2))+
+  geom_point(aes(color = date))+
+  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)
+
+
+# 2021 - 2022
+pc_1 <- test_new %>% 
+  filter(crop == 'corn' & year ==  '2021') %>% 
+  print(n = Inf)
+pb_1 <- test_new %>% 
+  filter(crop == 'beans' & year == '2022') %>% 
+  print(n = Inf)
+pc1_pb1 <- rbind(pc_1, pb_1)
+
+pc1_pb1_pops <- pc1_pb1[6:9]
+pc1_pb1_dist <- vegdist(pc1_pb1_pops, method = 'bray')
+p1_pc1_pb2 <- adonis2(pc1_pb1_dist ~ year + date + trt, permutations = factorial(10), method = 'bray', data = pc1_pb1)
+p1_pc1_pb2
+
+# Df SumOfSqs      R2      F    Pr(>F)    
+# year      1   1.0571 0.08099 7.4880 2.728e-05 ***
+#   date      2   2.1595 0.16545 7.6484 2.756e-07 ***
+#   trt       3   0.6598 0.05055 1.5578     0.101    
+# Residual 65   9.1763 0.70302                     
+#Total    71  13.0527 1.00000 
+
+nmds1 <- metaMDS(pc1_pb1_pops, k = 2)
+stressplot(nmds1)
+nmds0$stress
+# 0.1524051
+
+scores <- scores(nmds1, display = 'sites')
+scrs_2122 <- cbind(as.data.frame(scores), date = pc1_pb1$date)
+
+functional_scores <- as.data.frame(scores(nmds1, 'species'))
+functional_scores$species <- rownames(functional_scores)
+
+ggplot(data = scrs_2122, aes(x = NMDS1, y = NMDS2))+
+  geom_point(aes(color = date))+
+  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)
+
+
+# 2022 - 2023
+pc <- test_new %>% 
+    filter(crop == "corn" & year == "2022")
+pb <- test_new %>% 
+    filter(crop == "beans" & year == "2023")
+
+pc_pb <- rbind(pc, pb) 
+
+pc_pb_pops <- pc_pb[6:9]
+
+pc_pb_dist <- vegdist(pc_pb_pops, method = "bray")
+p1_cb <- adonis2(pc_pb_dist ~ year + date + trt, permutations = factorial(10), method = "bray", data = pc_pb)
+p1_cb
+
+# Df SumOfSqs      R2      F    Pr(>F)    
+# year      1   1.1525 0.07934 7.7637 6.614e-05 ***
+#   date      2   2.4554 0.16903 8.2698 2.756e-07 ***
+#   trt       3   0.3779 0.02601 0.8485    0.5933    
+# Residual 71  10.5403 0.72561                     
+# Total    77  14.5261 1.00000 
+
+nmds2 <- metaMDS(pc_pb_pops, k = 2)
+stressplot(nmds2)
+nmds0$stress
+# 0.1524051
+
+scores <- scores(nmds2, display = 'sites')
+scrs_2223 <- cbind(as.data.frame(scores), date = pc_pb$date)
+
+functional_scores <- as.data.frame(scores(nmds2, 'species'))
+functional_scores$species <- rownames(functional_scores)
+
+ggplot(data = scrs_2223, aes(x = NMDS1, y = NMDS2))+
+  geom_point(aes(color = date))+
+  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)
+
+
+
+
+
+
+
+# 4/12/2024: not using this anymore, this made the df too small
+# permed_micros <- perm_micros %>% 
+#   mutate(colembola = col_20 + col_10 + col_6 + col_4,
+#          Insects = Enich + hemip + AC + CL + AC + OAC + Psocodea+ Thrips+ sipoopter+hymen+ archaeognatha
+#          + dermaptera + lep+ Formicid + Coccomorpha+a_dipt + OL,
+#          mites = Orb + Norb,
+#          non_insect = spider + Pseu + Annelid+ protura + simphyla+pauropoda +Diplura +`Chil>5` + `Chil<5`+`Dip>5` + `Dip<5`) %>% 
+#   dplyr::select(-japy, - camp, -`Dip>5`, -`Dip<5`, -`Chil>5`, -`Chil<5`,
+#                 -col_20, -col_10, -col_6, -col_4, -Enich, -hemip, -sym, -pod, -ento, -Iso) %>% 
+#   dplyr::select(-Orb, -Norb, -spider, -Pseu, -CL, -OL, -OAC, -a_dipt, -AC, - Coccomorpha, -Psocodea, -Thrips, -simphyla, 
+#                 -pauropoda, -sipoopter, -Annelid, -protura, -hymen, -Formicid, -archaeognatha, -dermaptera, -lep, -Diplura) %>% 
+#   replace(is.na(.),0) %>% 
+#   mutate_at(vars(6:9), as.numeric) %>% 
+#   mutate(trt = as.factor(trt)) %>% 
+#   group_by(year, crop, date, trt) %>% 
+#   summarise(
+#     col = sum(colembola),
+#     ins = sum(Insects),
+#     mites = sum(mites), 
+#     non_insect = sum(non_insect)
+#   ) %>% 
+#   mutate(date = as.factor(date))
+# 
+# 
+# colnames(permed_micros)
+# 
+# perm_pops <- permed_micros[5:8]
+# 
+# perm_dist <- vegdist(perm_pops, "bray")
+# 
+# 
+# perm_1 <- adonis2(perm_dist ~ trt, permutations = 999, method = "bray", data = permed_micros)
+# perm_1
+# 
+# perm_2 <- adonis2(perm_dist ~ crop, permutations =  999, method = "bray", data = permed_micros)
+# perm_2
+# 
+# # this one. Factorial 10 for permutations because I shrank the df so much 
+# perm_3 <- adonis2(perm_dist ~ year + date + crop, permutations = 999, method = "bray", data = permed_micros)
+# perm_3
+# # Df SumOfSqs      R2      F    Pr(>F)    
+# # year      2   0.5580 0.13967 3.9173  0.001725 ** 
+# #   date      3   0.9222 0.23085 4.3166 9.425e-05 ***
+# #   crop      1   0.1645 0.04119 2.3105  0.068170 .  
+# # Residual 33   2.3502 0.58829                     
+# # Total    39   3.9949 1.00000    
+
+
+
+# comparing populations of the legacy years
+# 2021- 2022
+# can i do this? The collection methods changed a bit 
+# more samples in 2021?
+
+
+     
+
+
 
 
 
