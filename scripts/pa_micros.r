@@ -53,7 +53,7 @@ micros_set <- micros_ready %>%
                          plot %in% c(104,202,301,404,504) ~ 'Gr-Br')) %>% 
   mutate_at(vars(1:3), as.factor) %>% 
   mutate_at(vars(43), as.factor) %>% 
-  filter(!row_number() %in% c(46,47,71,83)) %>% # these rows are all NA, so when I replace with 0, they become all 0 and then vegdist cannot function. removing them early
+  # filter(!row_number() %in% c(46,47,71,83)) %>% # these rows are all NA, so when I replace with 0, they become all 0 and then vegdist cannot function. removing them early
   replace(is.na(.),0) %>% 
   print(n = Inf)
 # check to make sure these changes worked
@@ -63,6 +63,24 @@ unique(micros_set$plot)
 which(micros_set$trt == 'NA')
 which(micros_set$trt == 'Green')
 class(micros_set$trt)
+
+# need to divide the 2021 data / 3 to standardize them 
+subset_21 <- micros_set %>% 
+  filter(date %in% c('7/1/2021', '9/1/2021')) %>% 
+  arrange(date, plot) %>% 
+  mutate_if(is.numeric, ~ ./3) %>% 
+  print(n = Inf)
+unique(test$date)
+
+
+micro_other <- micros_set %>% 
+  filter(date != '7/1/2021', date != '9/1/2021')
+unique(micro_other$date)
+
+# brining back the og name from above 
+micros_set <- rbind(micro_other, subset_21) %>% 
+  arrange(crop,date, plot) %>% 
+  print(n = Inf)
 
 # scores ####
 micros_set
@@ -231,64 +249,85 @@ beans_trt_year_score <- micro_scores %>%
 
 # score stats ####
 
-colnames(micro_scores)
 
-#mixed model for avg score x trt? 
+
 micro_score_model
-p <- glmer(total_score ~ trt + 
-             (1|year/block),
-           family = poisson,
-           data = micro_score_model)
-nb <- glmer.nb(total_score ~ trt +
-                 (1|year/block),
-               data = micro_score_model)
+m1 <- glm.nb(total_score ~ trt + date, data = micro_score_model)
+hist(residuals(m1))
+summary(m1)
+cld(emmeans(m1, ~ date), Letters = letters)
 
-lrtest(p, nb)
+# date       emmean     SE  df asymp.LCL asymp.UCL .group
+# 2022-09-23   3.35 0.0926 Inf      3.17      3.53  a    
+# 2021-09-01   3.58 0.1295 Inf      3.33      3.84  ab   
+# 2023-07-18   3.72 0.0911 Inf      3.54      3.90  ab   
+# 2023-11-04   3.95 0.0904 Inf      3.77      4.13   b   
+# 2022-06-22   3.99 0.0903 Inf      3.82      4.17   b   
+# 2021-07-01   4.07 0.1477 Inf      3.78      4.36   b   
 
-hist(residuals(nb))
 
-# model with block = singular. I removed block
-m0 <- glmer.nb(total_score ~ 
-                 (1|year/crop), 
-               data = micro_score_model)
-m1 <- glmer.nb(total_score ~ trt+
-                 (1|year/crop), 
-               data = micro_score_model)
-m2 <- glmer.nb(total_score ~ trt + date +
-                 (1|year/crop), 
-               data = micro_score_model)
-m3 <- glmer.nb(total_score ~ trt*date +
-                 (1|year/crop), 
-               data = micro_score_model)
 
-anova(m0, m1, m2, m3)
-hist(residuals(m3))
-summary(m3)
-r2_nakagawa(m3)
-# Conditional R2: 0.411
-# Marginal R2: 0.411
 
-all_emm <- cld(emmeans(m3, ~trt + date), Letters = letters)
-# high levels of variation among year and trt
+
+# not using this but will leave it here for meow
+# colnames(micro_scores)
+# 
+# #mixed model for avg score x trt? 
+# micro_score_model
+# p <- glmer(total_score ~ trt + 
+#              (1|year/crop),
+#            family = poisson,
+#            data = micro_score_model)
+# nb <- glmer.nb(total_score ~ trt + date +
+#                  (1|year),
+#                data = micro_score_model)
+# 
+# lrtest(p, nb)
+# 
+# hist(residuals(nb))
+# 
+# # model with block = singular. I removed block
+# m0 <- glmer.nb(total_score ~ 
+#                  (1|year/crop), 
+#                data = micro_score_model)
+# m1 <- glmer.nb(total_score ~ trt+
+#                  (1|year/crop), 
+#                data = micro_score_model)
+# m2 <- glmer.nb(total_score ~ trt + date +
+#                  (1|crop), 
+#                data = micro_score_model)
+# # m3 <- glmer.nb(total_score ~ trt*date +
+# #                  (1|year/crop), 
+# #                data = micro_score_model)
+# 
+# anova(m0, m1, m2, m3)
+# hist(residuals(m2))
+# summary(m2)
+# r2_nakagawa(m3)
+# # Conditional R2: 0.411
+# # Marginal R2: 0.411
+# 
+# all_emm <- cld(emmeans(m3, ~trt + date), Letters = letters)
+# # high levels of variation among year and trt
 
 all_aov <- aov(total_score ~ year, data = micro_score_model)
 TukeyHSD(all_aov)
 hist(residuals(all_aov))
 # $year
 # diff       lwr       upr     p adj
-# 2022-2021 -39.851880 -51.56925 -28.13451 0.0000000
-# 2023-2021 -36.794643 -48.41928 -25.17001 0.0000000
-# 2023-2022   3.057237  -6.13074  12.24521 0.7120406
+# 2022-2021 -4.203571 -15.64270  7.235559 0.6611223
+# 2023-2021  1.033929 -10.40520 12.473059 0.9751895
+# 2023-2022  5.237500  -3.68719 14.162190 0.3501438
 
 corn_aov_df <- filter(micro_score_model, crop == 'corn')
 corn_aov <- aov(total_score ~ year, data = corn_aov_df)
 TukeyHSD(corn_aov)
 hist(residuals(corn_aov))
 # $year
-# diff       lwr       upr     p adj
-# 2022-2021 -37.046886 -50.22524 -23.86854 0.0000000
-# 2023-2021 -39.332143 -52.43235 -26.23194 0.0000000
-# 2023-2022  -2.285256 -15.02213  10.45161 0.9048108
+# diff       lwr      upr     p adj
+# 2022-2021 -0.3785714 -12.74795 11.99081 0.9970907
+# 2023-2021 -1.5035714 -13.87295 10.86581 0.9551049
+# 2023-2022 -1.1250000 -13.07496 10.82496 0.9728177
 
 beans_aov_df <- filter(micro_score_model, crop == 'beans')
 beans_aov <- aov(total_score ~ year, data = beans_aov_df)
@@ -296,7 +335,7 @@ TukeyHSD(beans_aov)
 hist(residuals(beans_aov))
 # $year
 # diff       lwr      upr     p adj
-# 2023-2022 8.551351 -2.784049 19.88675 0.1370824
+# 2023-2022 11.6 0.1879175 23.01208 0.0464333
 
 ####
 ###
@@ -309,39 +348,29 @@ corn_only <- micro_score_model %>%
   filter(crop == 'corn')
 
 #2021 
-
+# no trt significance, do not need it here
 corn_1 <- corn_only %>% 
   filter(year == '2021')
-corn_1_mod <- MASS::glm.nb(total_score ~ trt * date, data = corn_1)
+corn_1_mod <- MASS::glm.nb(total_score ~ date, data = corn_1)
 summary(corn_1_mod)
 hist(residuals(corn_1_mod))
-cld(emmeans(corn_1_mod, ~trt*date), Letters = letters)
-# trt   date       emmean    SE  df asymp.LCL asymp.UCL .group
-# Brown 2021-09-01   4.14 0.122 Inf      3.90      4.38  a    
-# Check 2021-07-01   4.22 0.135 Inf      3.95      4.48  a    
-# Check 2021-09-01   4.23 0.121 Inf      3.99      4.46  a    
-# Gr-Br 2021-09-01   4.44 0.118 Inf      4.21      4.67  a    
-# Brown 2021-07-01   4.56 0.131 Inf      4.30      4.82  a    
-# Green 2021-09-01   4.57 0.117 Inf      4.34      4.80  a    
-# Gr-Br 2021-07-01   4.57 0.117 Inf      4.35      4.80  a    
-# Green 2021-07-01   4.70 0.184 Inf      4.34      5.06  a    
+corn_1_mode_df <- cld(emmeans(corn_1_mod, ~date), Letters = letters)
+# date       emmean     SE  df asymp.LCL asymp.UCL .group
+# 2021-09-01   3.59 0.0924 Inf      3.41      3.77  a    
+# 2021-07-01   4.06 0.1034 Inf      3.86      4.27   b  
 
 #2022
 corn_2 <- corn_only %>% 
   filter(year == '2022')
-corn_2_mod <- MASS::glm.nb(total_score ~ trt * date, data = corn_2)
+corn_2_mod <- MASS::glm.nb(total_score ~ date, data = corn_2)
 summary(corn_2_mod)
 hist(residuals(corn_2_mod))
-corn_2_mod_df <- cld(emmeans(corn_2_mod, ~trt*date), Letters = letters)
-# trt   date       emmean    SE  df asymp.LCL asymp.UCL .group
-# Brown 2022-09-23   3.10 0.186 Inf      2.74      3.46  a    
-# Check 2022-09-23   3.21 0.183 Inf      2.85      3.57  ab   
-# Gr-Br 2022-09-23   3.57 0.176 Inf      3.23      3.92  abc  
-# Brown 2022-06-22   3.87 0.172 Inf      3.53      4.21   bcd 
-# Green 2022-06-22   3.89 0.172 Inf      3.56      4.23   bcd 
-# Green 2022-09-23   3.97 0.171 Inf      3.63      4.30   bcd 
-# Check 2022-06-22   4.18 0.169 Inf      3.85      4.51    cd 
-# Gr-Br 2022-06-22   4.39 0.187 Inf      4.02      4.75     d 
+corn_2_mod_df <- cld(emmeans(corn_2_mod, ~date), Letters = letters)
+
+# date       emmean    SE  df asymp.LCL asymp.UCL .group
+# 2022-09-23   3.52 0.139 Inf      3.25      3.79  a    
+# 2022-06-22   4.04 0.136 Inf      3.77      4.30   b   
+
 corn_2_plot <- corn_2 %>% 
   group_by(trt, date) %>% 
   summarise(mean = mean(total_score),
@@ -360,19 +389,19 @@ ggplot(corn_2_plot, aes(x = trt, y = mean))+
 #2023
 corn_3 <- corn_only %>% 
   filter(year == '2023')
-corn_3_mod <- MASS::glm.nb(total_score ~ trt * date, data = corn_3)
+corn_3_mod <- MASS::glm.nb(total_score ~ trt + date, data = corn_3)
 summary(corn_3_mod)
 hist(residuals(corn_3_mod))
-cld(emmeans(corn_3_mod, ~trt*date), Letters = letters)
+cld(emmeans(corn_3_mod, ~trt + date), Letters = letters)
 # trt   date       emmean    SE  df asymp.LCL asymp.UCL .group
-# Brown 2023-07-18   3.23 0.207 Inf      2.82      3.63  a    
-# Check 2023-07-18   3.60 0.201 Inf      3.21      3.99  a    
-# Check 2023-11-04   3.77 0.199 Inf      3.38      4.16  a    
-# Gr-Br 2023-07-18   3.78 0.199 Inf      3.39      4.17  a    
-# Brown 2023-11-04   3.81 0.198 Inf      3.42      4.20  a    
-# Gr-Br 2023-11-04   3.85 0.198 Inf      3.46      4.23  a    
-# Green 2023-07-18   3.98 0.197 Inf      3.59      4.36  a    
-# Green 2023-11-04   4.07 0.196 Inf      3.69      4.46  a    
+# Brown 2023-07-18   3.43 0.164 Inf      3.11      3.75  a    
+# Check 2023-07-18   3.57 0.162 Inf      3.25      3.89  a    
+# Brown 2023-11-04   3.65 0.163 Inf      3.33      3.97  a    
+# Gr-Br 2023-07-18   3.70 0.161 Inf      3.39      4.02  a    
+# Check 2023-11-04   3.79 0.162 Inf      3.48      4.11  a    
+# Green 2023-07-18   3.92 0.160 Inf      3.60      4.23  a    
+# Gr-Br 2023-11-04   3.93 0.161 Inf      3.61      4.24  a    
+# Green 2023-11-04   4.14 0.159 Inf      3.83      4.45  a    
 
 
 # beans
@@ -382,19 +411,19 @@ beans_only <- micro_score_model %>%
 #2022
 beans_1 <- beans_only %>% 
   filter(year == '2022')
-beans_1_mod <- MASS::glm.nb(total_score ~ trt * date, data = beans_1)
+beans_1_mod <- MASS::glm.nb(total_score ~ trt + date, data = beans_1)
 summary(beans_1_mod)
 hist(residuals(beans_1_mod))
-beans_1_mod_df <- cld(emmeans(beans_1_mod, ~trt*date), Letters = letters)
+beans_1_mod_df <- cld(emmeans(beans_1_mod, ~trt + date), Letters = letters)
 # trt   date       emmean    SE  df asymp.LCL asymp.UCL .group
-# Green 2022-09-23   3.03 0.248 Inf      2.54      3.51  a    
-# Gr-Br 2022-09-23   3.05 0.247 Inf      2.57      3.54  ab   
-# Brown 2022-09-23   3.38 0.271 Inf      2.85      3.91  abc  
-# Check 2022-09-23   3.39 0.242 Inf      2.92      3.87  abc  
-# Check 2022-06-22   3.79 0.265 Inf      3.27      4.31  abc  
-# Green 2022-06-22   4.06 0.263 Inf      3.55      4.58  abc  
-# Brown 2022-06-22   4.07 0.235 Inf      3.61      4.53   bc  
-# Gr-Br 2022-06-22   4.17 0.234 Inf      3.72      4.63    c  
+# Green 2022-09-23   3.05 0.297 Inf      2.47      3.64  a    
+# Check 2022-09-23   3.14 0.297 Inf      2.56      3.72  a    
+# Brown 2022-09-23   3.24 0.296 Inf      2.66      3.82  a    
+# Gr-Br 2022-09-23   3.25 0.296 Inf      2.67      3.84  a    
+# Green 2022-06-22   3.81 0.295 Inf      3.23      4.39  a    
+# Check 2022-06-22   3.90 0.295 Inf      3.32      4.47  a    
+# Brown 2022-06-22   4.00 0.294 Inf      3.42      4.58  a    
+# Gr-Br 2022-06-22   4.01 0.294 Inf      3.43      4.59  a 
 beans_1_plot <- beans_1 %>% 
   group_by(trt, date) %>% 
   summarise(mean = mean(total_score),
@@ -414,20 +443,19 @@ ggplot(beans_1_plot, aes(x = trt, y = mean))+
 #2023
 beans_2 <- beans_only %>% 
   filter(year == '2023')
-beans_2_mod <- MASS::glm.nb(total_score ~ trt * date, data = beans_2)
+beans_2_mod <- MASS::glm.nb(total_score ~ trt + date, data = beans_2)
 summary(beans_2_mod)
 hist(residuals(beans_2_mod))
-cld(emmeans(beans_2_mod, ~trt*date), Letters = letters)
+cld(emmeans(beans_2_mod, ~trt+date), Letters = letters)
 # trt   date       emmean    SE  df asymp.LCL asymp.UCL .group
-# Check 2023-07-18   3.63 0.223 Inf      3.19      4.06  a    
-# Gr-Br 2023-07-18   3.73 0.222 Inf      3.30      4.17  a    
-# Green 2023-07-18   3.76 0.222 Inf      3.33      4.20  a    
-# Gr-Br 2023-11-04   3.83 0.221 Inf      3.40      4.26  a    
-# Brown 2023-11-04   3.90 0.220 Inf      3.46      4.33  a    
-# Brown 2023-07-18   3.90 0.220 Inf      3.47      4.33  a    
-# Green 2023-11-04   4.09 0.219 Inf      3.66      4.52  a    
-# Check 2023-11-04   4.20 0.218 Inf      3.77      4.63  a    
-
+# Gr-Br 2023-07-18   3.66 0.180 Inf      3.31      4.01  a    
+# Brown 2023-07-18   3.78 0.179 Inf      3.43      4.13  a    
+# Green 2023-07-18   3.80 0.179 Inf      3.45      4.15  a    
+# Check 2023-07-18   3.80 0.179 Inf      3.45      4.16  a    
+# Gr-Br 2023-11-04   3.91 0.179 Inf      3.56      4.26  a    
+# Brown 2023-11-04   4.03 0.179 Inf      3.68      4.38  a    
+# Green 2023-11-04   4.05 0.179 Inf      3.70      4.40  a    
+# Check 2023-11-04   4.05 0.179 Inf      3.70      4.40  a
 
 
 # 
@@ -488,10 +516,79 @@ ggplot(corn_trt_year_score, aes(x = year, y = avg, fill = year))+
         plot.subtitle = element_text(size = 24),
         panel.grid.major.y = element_line(color = "darkgrey"),
         panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank())
+
+
+# 2021 corn
+corn_1_plot <- corn_1 %>% 
+  group_by(date) %>% 
+  summarise(mean = mean(total_score),
+            sd = sd(total_score),
+            n = n(), 
+            se = sd/sqrt(n)) 
+
+ggplot(corn_1_plot, aes(x = date, y = mean, fill = date))+
+  geom_bar(stat = 'identity', position = 'dodge', alpha = 0.7)+
+  geom_errorbar(aes(ymin = mean - se, ymax = mean +se), 
+                position = position_dodge(0.9),
+                width = 0.4, linewidth = 1.3)+
+  scale_fill_manual(values = c("#E7298A", "#7570B3"))+
+  scale_x_discrete(labels = c('1 July 2021', '1 September 2021'))+
+  labs(
+    title = 'Corn 2021 AVG QBS x Date',
+    x = 'Sampling Date', 
+    y = 'Average QBS Score'
+  )+
+  theme(legend.position = 'none',
+        axis.text.x = element_text(size=26),
+        axis.text.y = element_text(size = 26),
+        axis.title = element_text(size = 32),
+        plot.title = element_text(size = 28),
+        plot.subtitle = element_text(size = 24),
+        panel.grid.major.y = element_line(color = "darkgrey"),
+        panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank())+
-  annotate("text", x = 1, y = 92, label = "a", size = 10)+
-  annotate("text", x = 2, y = 92, label = "b", size = 10)+
-  annotate("text", x = 3, y = 92, label = "b", size = 10)
+  annotate('text', x = 1, y = 67, label = 'a', size = 10)+
+  annotate('text' , x = 2, y = 67, label = 'b', size = 10)
+
+# 2022 corn 
+corn_2_plot <- corn_2 %>% 
+  group_by(date) %>% 
+  summarise(mean = mean(total_score),
+            sd = sd(total_score),
+            n = n(), 
+            se = sd/sqrt(n)) 
+
+# just looking here
+ggplot(corn_2_plot, aes(x = date, y = mean, fill = date))+
+  geom_bar(stat = 'identity', position = 'dodge', alpha = 0.7)+
+  geom_errorbar(aes(ymin = mean - se, ymax = mean +se), 
+                position = position_dodge(0.9),
+                width = 0.4, linewidth = 1.3)+
+  scale_fill_manual(values = c("#E7298A", "#7570B3"))+
+  scale_x_discrete(labels = c('22 June 2022', '23 September 2022'))+
+  labs(
+    title = 'Corn 2022 AVG QBS x Date',
+    x = 'Sampling Date', 
+    y = 'Average QBS Score'
+  )+
+  theme(legend.position = 'none',
+        axis.text.x = element_text(size=26),
+        axis.text.y = element_text(size = 26),
+        axis.title = element_text(size = 32),
+        plot.title = element_text(size = 28),
+        plot.subtitle = element_text(size = 24),
+        panel.grid.major.y = element_line(color = "darkgrey"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank())+
+  annotate('text', x = 1, y = 65, label = 'a', size = 10)+
+  annotate('text' , x = 2, y = 65, label = 'b', size = 10)
+
+
+
+
+
+
 
 # beans by year plot 
 ggplot(beans_trt_year_score, aes(x = year, y = avg, fill = year))+
@@ -545,11 +642,23 @@ geom_text(aes(x = trt, y = 4.8, label = trimws(.group)), size = 10, color = "bla
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+# extra plots from all years and crops. Only really the ones where there are differences
+
 corn_2_mod_df
 
-ggplot(corn_2_mod_df, aes(x = trt, y = emmean, fill = trt))+
+ggplot(corn_2_mod_df, aes(x = date, y = emmean, fill = date))+
   geom_bar(stat = 'identity', position = "dodge", alpha = 0.7)+
-  facet_wrap(~date)+
   scale_fill_manual(values = c("#E7298A", "#D95F02" ,"#7570B3", "#1B9E77"))+
   scale_x_discrete(limits = c('Check', 'Brown', "Gr-Br", 'Green'),
                    labels=c("No CC", "14-28 DPP", "3-7 DPP", "1-3 DAP"))+
@@ -574,10 +683,6 @@ ggplot(corn_2_mod_df, aes(x = trt, y = emmean, fill = trt))+
 
 
 
-
-
-
-# extra plots from all years and crops. Only really the ones where there are differences
 # 2021
 unique(mean_scores$date)
 micros_21 <- filter(mean_scores, year == '2021') %>% 
