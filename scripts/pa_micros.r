@@ -430,6 +430,7 @@ overall_a.cb <- abundance_model %>%
 
 ggplot(overall_a.cb, aes(x = crop, y = mean, fill = crop))+
   geom_bar(stat = 'identity', position = "dodge", alpha = 0.7)+
+  scale_x_discrete(labels = c('beans' = 'Soybean', 'corn' = 'Corn'))+
   scale_fill_manual(values = c( "#1B9E77","#D95F02"),
                     name = "Crop", labels = c("Soybean", "Corn"))+
   geom_errorbar(aes(x = crop, ymin = mean-se, ymax = mean+se), 
