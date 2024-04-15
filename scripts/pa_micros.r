@@ -46,8 +46,18 @@ micros_ready <- micros %>%
   ungroup() %>% 
   print(n = Inf)
 
-# need to add treatment in now
-micros_set <- micros_ready %>% 
+date <- '7/1/2021'
+crop <- 'corn'
+plot <- c('102', '103', '203', '303', '502')
+missing_date <- data.frame(date, crop, plot)
+missing <- as_tibble(missing_date) %>% 
+  mutate(plot = as.double(plot))
+
+micros_next <- as_tibble(dplyr::bind_rows(missing, micros_ready)) %>% 
+  print(n = Inf)
+
+# need to add  treatment in now
+micros_set <- micros_next %>% 
   mutate(plot = replace(plot, plot == 507, 502)) %>% # there is a sneaky 507 plot number
   mutate(trt = case_when(plot %in% c(101,203,304,401,503) ~ 'Check',
                          plot %in% c(102,201,303,402,502) ~ 'Green',
@@ -57,14 +67,9 @@ micros_set <- micros_ready %>%
   mutate_at(vars(43), as.factor) %>% 
   # filter(!row_number() %in% c(46,47,71,83)) %>% # these rows are all NA, so when I replace with 0, they become all 0 and then vegdist cannot function. removing them early
   replace(is.na(.),0) %>% 
+  arrange(date, crop, plot) %>% 
   print(n = Inf)
-# check to make sure these changes worked
-colnames(micros_set)
-unique(micros_set$trt)
-unique(micros_set$plot)
-which(micros_set$trt == 'NA')
-which(micros_set$trt == 'Green')
-class(micros_set$trt)
+
 
 # need to divide the 2021 data / 3 to standardize them 
 subset_21 <- micros_set %>% 
@@ -155,6 +160,232 @@ fp <- flextable(paper) %>%
 fp <- theme_zebra(fp)
 autofit(fp) %>% 
   save_as_docx(path = 'ce2Totalmicros.docx')
+
+# abundance ####
+# overall model 
+
+abundance_model <- micros_set %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_abund = dplyr::select(.,5:43) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  dplyr::select(date, crop, plot, trt, total_abund) %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year) %>% 
+  mutate_at(vars(1:2),as.factor)
+##
+#
+
+# for the crop models 
+c.abund_model <- micros_set %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_abund = dplyr::select(.,5:43) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  dplyr::select(date, crop, plot, trt, total_abund) %>% 
+  filter(crop == 'corn') %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year) %>% 
+  mutate_at(vars(1:2),as.factor)
+
+b.abund_model <- micros_set %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_abund = dplyr::select(.,5:43) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  dplyr::select(date, crop, plot, trt, total_abund) %>% 
+  filter(crop == 'beans') %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year) %>% 
+  mutate_at(vars(1:2),as.factor)
+##
+#
+
+
+# for the comparisons 
+micros_set
+colnames(micros_set)
+unique(micros_set$crop)
+# corn
+corn_micro_totals <- micros_set %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_abund = dplyr::select(.,5:43) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  dplyr::select(date, crop, plot, trt, total_abund) %>% 
+  filter(crop == 'corn') %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year) %>% 
+  dplyr::select(-date) %>% 
+  group_by(year, trt) %>% 
+  summarise(avg_abund = mean(total_abund))
+
+
+# beans
+bean_micro_totals <- micros_set %>% 
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_abund = dplyr::select(.,5:43) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  dplyr::select(date, crop, plot, trt, total_abund) %>% 
+  filter(crop == 'beans') %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(year = format(date, "%Y")) %>% 
+  relocate(year) %>% 
+  dplyr::select(-date) %>% 
+  group_by(year, trt) %>% 
+  summarise(avg_abund = mean(total_abund)) %>% 
+  filter(trt != "Check")
+
+# abundance stats ####
+abundance_model
+a1 <- glm(total_abund ~ crop + trt + date, data = abundance_model)
+hist(residuals(a1))
+summary(a1)
+cld(emmeans(a1, ~crop + date), Letters = letters)
+# crop  date       emmean   SE  df lower.CL upper.CL .group
+# beans 2021-09-01   6.61 4.97 190   -3.189     16.4  a    
+# beans 2021-07-01   9.37 4.97 190   -0.431     19.2  ab   
+# beans 2023-07-18  11.26 3.21 190    4.938     17.6  a    
+# corn  2021-09-01  13.98 4.06 190    5.984     22.0  ab   
+# beans 2022-06-22  14.21 3.21 190    7.888     20.5  ab   
+# corn  2021-07-01  16.75 4.06 190    8.741     24.8  ab   
+# beans 2023-11-04  17.14 3.21 190   10.813     23.5  ab   
+# corn  2023-07-18  18.64 3.21 190   12.313     25.0  ab   
+# corn  2022-06-22  21.59 3.21 190   15.263     27.9  ab   
+# beans 2022-09-23  22.84 3.21 190   16.513     29.2  ab   
+# corn  2023-11-04  24.51 3.21 190   18.188     30.8  ab   
+# corn  2022-09-23  30.21 3.21 190   23.888     36.5   b
+
+# just crop 
+cld(emmeans(a1, ~crop), Letters = letters)
+# crop  emmean   SE  df lower.CL upper.CL .group
+# beans   13.6 2.34 190     8.95     18.2  a    
+# corn    20.9 1.66 190    17.68     24.2   b 
+
+# corn 
+a2 <- glm(total_abund ~ year, data = c.abund_model)
+hist(residuals(a2))
+summary(a2)
+cld(emmeans(a2, ~year), Letters= letters)
+# year emmean   SE  df lower.CL upper.CL .group
+# 2023   14.8 3.04 117     8.76     20.8  a    
+# 2021   15.2 3.04 117     9.20     21.2  a    
+# 2022   32.7 3.04 117    26.68     38.7   b 
+
+# only one with anything sig going on
+corn_21_a <- c.abund_model %>% 
+  filter(year == '2021')
+unique(corn_21_a$plot)
+a3 <- glm(total_abund ~ trt + date, data = corn_21_a)
+hist(residuals(a3))
+summary(a3)
+cld(emmeans(a3, ~ trt + date), Letters= letters)
+# trt   date       emmean   SE df lower.CL upper.CL .group
+# Check 2021-09-01   7.43 4.36 35    -1.41     16.3  a    
+# Check 2021-07-01   9.90 4.36 35     1.06     18.7  a    
+# Brown 2021-09-01  11.37 4.36 35     2.52     20.2  a    
+# Brown 2021-07-01  13.83 4.36 35     4.99     22.7  a    
+# Green 2021-09-01  14.87 4.36 35     6.02     23.7  a    
+# Green 2021-07-01  17.33 4.36 35     8.49     26.2  a    
+# Gr-Br 2021-09-01  22.27 4.36 35    13.42     31.1  a    
+# Gr-Br 2021-07-01  24.73 4.36 35    15.89     33.6  a 
+# 
+# > cld(emmeans(a3, ~ trt ), Letters= letters)
+# trt   emmean  SE df lower.CL upper.CL .group
+# Check   8.67 3.9 35    0.756     16.6  a    
+# Brown  12.60 3.9 35    4.689     20.5  a    
+# Green  16.10 3.9 35    8.189     24.0  a    
+# Gr-Br  23.50 3.9 35   15.589     31.4  a
+# 
+# > cld(emmeans(a3, ~ date), Letters= letters)
+# date       emmean   SE df lower.CL upper.CL .group
+# 2021-09-01   14.0 2.76 35     8.39     19.6  a    
+# 2021-07-01   16.4 2.76 35    10.86     22.0  a  
+
+corn_22_a <- c.abund_model %>% 
+  filter(year == '2022')
+unique(corn_22_a$plot)
+a4 <- glm(total_abund ~ trt + date, data = corn_22_a)
+hist(residuals(a4))
+summary(a4)
+cld(emmeans(a4, ~trt + date), Letters = letters)
+# trt   date       emmean   SE df lower.CL upper.CL .group
+# Check 2022-06-22   18.9 9.69 35   -0.764     38.6  a    
+# Gr-Br 2022-06-22   22.0 9.69 35    2.336     41.7  a    
+# Brown 2022-06-22   22.3 9.69 35    2.636     42.0  a    
+# Green 2022-06-22   27.6 9.69 35    7.936     47.3  a    
+# Check 2022-09-23   38.9 9.69 35   19.236     58.6  a    
+# Gr-Br 2022-09-23   42.0 9.69 35   22.336     61.7  a    
+# Brown 2022-09-23   42.3 9.69 35   22.636     62.0  a    
+# Green 2022-09-23   47.6 9.69 35   27.936     67.3  a 
+
+corn_23_a <- c.abund_model %>% 
+  filter(year == '2023')
+unique(corn_23_a$plot)
+a5 <- glm(total_abund ~ trt + date, data = corn_23_a)
+hist(residuals(a5))
+summary(a5)
+cld(emmeans(a5, ~ trt + date ), Letters = letters)
+# trt   date       emmean   SE df lower.CL upper.CL .group
+# Gr-Br 2023-07-18   11.0 4.52 35     1.85     20.2  a    
+# Brown 2023-07-18   11.8 4.52 35     2.65     21.0  a    
+# Check 2023-07-18   12.4 4.52 35     3.25     21.6  a    
+# Green 2023-07-18   14.7 4.52 35     5.55     23.9  a    
+# Gr-Br 2023-11-04   15.6 4.52 35     6.40     24.7  a    
+# Brown 2023-11-04   16.4 4.52 35     7.20     25.5  a    
+# Check 2023-11-04   17.0 4.52 35     7.80     26.1  a    
+# Green 2023-11-04   19.3 4.52 35    10.10     28.4  a 
+
+# beans
+b1 <- glm(total_abund ~ year, data = b.abund_model)
+hist(residuals(b1))
+summary(b1)
+cld(emmeans(b1, ~year), Letters = letters)
+# year emmean   SE df lower.CL upper.CL .group
+# 2022   11.7 2.22 78     7.31     16.1  a    
+# 2023   21.0 2.22 78    16.58     25.4   b  
+
+beans_22_a <- b.abund_model %>% 
+  filter(year == '2022')
+b2 <- glm(total_abund ~ trt +date , data = beans_22_a)
+hist(residuals(b2))
+summary(b2)
+cld(emmeans(b2, ~ trt +date), Letters = letters)
+# trt   date       emmean   SE df lower.CL upper.CL .group
+# Brown 2022-09-23   7.03 3.41 35    0.103     13.9  a    
+# Check 2022-09-23   9.72 3.41 35    2.803     16.6  a    
+# Brown 2022-06-22   9.78 3.41 35    2.853     16.7  a    
+# Gr-Br 2022-09-23  12.12 3.41 35    5.203     19.0  a    
+# Check 2022-06-22  12.47 3.41 35    5.553     19.4  a    
+# Green 2022-09-23  12.53 3.41 35    5.603     19.4  a    
+# Gr-Br 2022-06-22  14.88 3.41 35    7.953     21.8  a    
+# Green 2022-06-22  15.28 3.41 35    8.353     22.2  a 
+
+beans_23_a <- c.abund_model %>% 
+  filter(year == '2023')
+b3 <- glm(total_abund ~trt + date, data = beans_23_a)
+hist(residuals(b3))
+summary(b3)
+cld(emmeans(b3, ~trt + date), Letters = letters)
+# trt   date       emmean   SE df lower.CL upper.CL .group
+# Gr-Br 2023-07-18   11.0 4.52 35     1.85     20.2  a    
+# Brown 2023-07-18   11.8 4.52 35     2.65     21.0  a    
+# Check 2023-07-18   12.4 4.52 35     3.25     21.6  a    
+# Green 2023-07-18   14.7 4.52 35     5.55     23.9  a    
+# Gr-Br 2023-11-04   15.6 4.52 35     6.40     24.7  a    
+# Brown 2023-11-04   16.4 4.52 35     7.20     25.5  a    
+# Check 2023-11-04   17.0 4.52 35     7.80     26.1  a    
+# Green 2023-11-04   19.3 4.52 35    10.10     28.4  a 
+
+# abundance plots ####
+abundance_model %>% 
+  group_by(crop, trt) %>% 
+  summarise(mean = mean(total_abund), 
+            sd = sd(total_abund), 
+            n = n(), 
+            se = sd/sqrt(n)) %>% 
+  arrange(crop) %>% 
+  print(n = Inf)
 
 
 # scores ####
@@ -277,6 +508,12 @@ overall_fig <- micro_scores %>%
                    se = sd/sqrt(n())) %>% 
   print(n = Inf)
 
+# table of this for the paper
+overall <- flextable(overall_fig)
+overall <- theme_zebra(overall)
+autofit(overall) %>% 
+  save_as_docx(path = 'overall_scores.docx')
+
 
 # overall corn fig
 corn_trt_year_score <- micro_scores %>%
@@ -327,50 +564,39 @@ beans_trt_year_score <- micro_scores %>%
 
 # score stats ####
 
-
-
 micro_score_model
-m1 <- glm.nb(total_score ~ trt + date, data = micro_score_model)
+m1 <- glm(total_score ~ trt + date, data = micro_score_model)
 hist(residuals(m1))
 summary(m1)
 cld(emmeans(m1, ~ date), Letters = letters)
 
-# date       emmean     SE  df asymp.LCL asymp.UCL .group
-# 2021-09-01   3.58 0.1316 Inf      3.32      3.84  a    
-# 2023-07-18   3.76 0.0924 Inf      3.58      3.94  ab   
-# 2022-09-23   3.87 0.0921 Inf      3.69      4.05  ab   
-# 2023-11-04   4.01 0.0917 Inf      3.83      4.19  ab   
-# 2022-06-22   4.05 0.0916 Inf      3.87      4.23   b   
-# 2021-07-01   4.07 0.1501 Inf      3.78      4.37  ab
+# date       emmean   SE  df lower.CL upper.CL .group
+# 2021-09-01   36.2 5.32 186     25.7     46.7  a    
+# 2023-07-18   43.1 3.76 186     35.7     50.6  ab   
+# 2022-09-23   48.3 3.76 186     40.9     55.7  ab   
+# 2023-11-04   55.5 3.76 186     48.1     62.9   b   
+# 2022-06-22   56.9 3.76 186     49.5     64.3   b   
+# 2021-07-01   58.9 6.16 186     46.7     71.0  ab 
 
 
+corn_df <- filter(micro_score_model, crop == 'corn')
+corn_m1 <- glm(total_score ~ year, data = corn_aov_df)
+summary(corn_m1)
+hist(residuals(corn_m1))
+cld(emmeans(corn_m1, ~year), Letters = letters)
+# year emmean   SE  df lower.CL upper.CL .group
+# 2021   45.6 3.82 112     38.1     53.2  a    
+# 2023   46.6 3.58 112     39.5     53.7  a    
+# 2022   57.7 3.58 112     50.6     64.8  a 
 
-all_aov <- aov(total_score ~ year, data = micro_score_model)
-TukeyHSD(all_aov)
-hist(residuals(all_aov))
-# $year
-# diff        lwr       upr     p adj
-# 2022-2021  6.971429  -4.798941 18.741799 0.3434406
-# 2023-2021  3.708929  -8.061441 15.479299 0.7374329
-# 2023-2022 -3.262500 -12.445619  5.920619 0.6791686
-corn_aov_df <- filter(micro_score_model, crop == 'corn')
-corn_aov <- aov(total_score ~ year, data = corn_aov_df)
-TukeyHSD(corn_aov)
-hist(residuals(corn_aov))
-# $year
-# diff        lwr        upr     p adj
-# 2022-2021  12.0714286  -0.368687 24.5115441 0.0592100
-# 2023-2021   0.9464286 -11.493687 13.3865441 0.9821613
-# 2023-2022 -11.1250000 -23.143293  0.8932934 0.0757645
-
-beans_aov_df <- filter(micro_score_model, crop == 'beans')
-beans_aov <- aov(total_score ~ year, data = beans_aov_df)
-TukeyHSD(beans_aov)
-hist(residuals(beans_aov))
-# $year
-# diff      lwr      upr     p adj
-# 2023-2022  4.6 -7.33291 16.53291 0.4451317
-
+beans_df <- filter(micro_score_model, crop == 'beans')
+beans_m1 <- glm(total_score ~ year, data = beans_aov_df)
+summary(beans_m1)
+hist(residuals(beans_m1))
+cld(emmeans(beans_m1, ~year), Letters = letters)
+# year emmean   SE df lower.CL upper.CL .group
+# 2022   47.5 4.24 78     39.1     55.9  a    
+# 2023   52.1 4.24 78     43.7     60.5  a  
 ####
 ###
 ##
@@ -385,25 +611,25 @@ corn_only <- micro_score_model %>%
 # no trt significance, do not need it here
 corn_1 <- corn_only %>% 
   filter(year == '2021')
-corn_1_mod <- MASS::glm.nb(total_score ~ date, data = corn_1)
+corn_1_mod <- glm(total_score ~ date, data = corn_1)
 summary(corn_1_mod)
 hist(residuals(corn_1_mod))
 corn_1_mode_df <- cld(emmeans(corn_1_mod, ~date), Letters = letters)
-# date       emmean     SE  df asymp.LCL asymp.UCL .group
-# 2021-09-01   3.59 0.0924 Inf      3.41      3.77  a    
-# 2021-07-01   4.06 0.1034 Inf      3.86      4.27   b  
+# date       emmean   SE df lower.CL upper.CL .group
+# 2021-09-01   36.2 4.32 33     27.4     45.0  a    
+# 2021-07-01   58.2 4.98 33     48.1     68.3   b   
 
 #2022
 corn_2 <- corn_only %>% 
   filter(year == '2022')
-corn_2_mod <- MASS::glm.nb(total_score ~ date, data = corn_2)
+corn_2_mod <- glm(total_score ~ date, data = corn_2)
 summary(corn_2_mod)
 hist(residuals(corn_2_mod))
 corn_2_mod_df <- cld(emmeans(corn_2_mod, ~date), Letters = letters)
 # 
-# date       emmean    SE  df asymp.LCL asymp.UCL .group
-# 2022-09-23   4.04 0.131 Inf      3.78      4.29  a    
-# 2022-06-22   4.07 0.131 Inf      3.82      4.33  a    
+# date       emmean   SE df lower.CL upper.CL .group
+# 2022-09-23   56.6 5.32 38     45.9     67.4  a    
+# 2022-06-22   58.8 5.32 38     48.0     69.5  a    
 
 corn_2_plot <- corn_2 %>% 
   group_by(trt, date) %>% 
@@ -423,19 +649,19 @@ ggplot(corn_2_plot, aes(x = trt, y = mean))+
 #2023
 corn_3 <- corn_only %>% 
   filter(year == '2023')
-corn_3_mod <- MASS::glm.nb(total_score ~ trt + date, data = corn_3)
+corn_3_mod <- glm(total_score ~ trt + date, data = corn_3)
 summary(corn_3_mod)
 hist(residuals(corn_3_mod))
 cld(emmeans(corn_3_mod, ~trt + date), Letters = letters)
-# trt   date       emmean    SE  df asymp.LCL asymp.UCL .group
-# Brown 2023-07-18   3.43 0.164 Inf      3.11      3.75  a    
-# Check 2023-07-18   3.57 0.162 Inf      3.25      3.89  a    
-# Brown 2023-11-04   3.65 0.163 Inf      3.33      3.97  a    
-# Gr-Br 2023-07-18   3.70 0.161 Inf      3.39      4.02  a    
-# Check 2023-11-04   3.79 0.162 Inf      3.48      4.11  a    
-# Green 2023-07-18   3.92 0.160 Inf      3.60      4.23  a    
-# Gr-Br 2023-11-04   3.93 0.161 Inf      3.61      4.24  a    
-# Green 2023-11-04   4.14 0.159 Inf      3.83      4.45  a    
+# trt   date       emmean   SE df lower.CL upper.CL .group
+# Brown 2023-07-18   33.1 7.52 35     17.8     48.3  a    
+# Check 2023-07-18   36.8 7.52 35     21.5     52.0  a    
+# Gr-Br 2023-07-18   41.6 7.52 35     26.3     56.8  a    
+# Brown 2023-11-04   43.7 7.52 35     28.5     59.0  a    
+# Check 2023-11-04   47.4 7.52 35     32.2     62.7  a    
+# Gr-Br 2023-11-04   52.2 7.52 35     37.0     67.5  a    
+# Green 2023-07-18   53.6 7.52 35     38.3     68.8  a    
+# Green 2023-11-04   64.2 7.52 35     49.0     79.5  a     
 
 
 # beans
@@ -445,19 +671,19 @@ beans_only <- micro_score_model %>%
 #2022
 beans_1 <- beans_only %>% 
   filter(year == '2022')
-beans_1_mod <- MASS::glm.nb(total_score ~ trt + date, data = beans_1)
+beans_1_mod <- glm(total_score ~ trt + date, data = beans_1)
 summary(beans_1_mod)
 hist(residuals(beans_1_mod))
 beans_1_mod_df <- cld(emmeans(beans_1_mod, ~trt + date), Letters = letters)
-# trt   date       emmean    SE  df asymp.LCL asymp.UCL .group
-# Green 2022-09-23   3.59 0.305 Inf      3.00      4.19  a    
-# Brown 2022-09-23   3.65 0.304 Inf      3.05      4.24  a    
-# Check 2022-09-23   3.70 0.304 Inf      3.10      4.29  a    
-# Gr-Br 2022-09-23   3.81 0.304 Inf      3.22      4.41  a    
-# Green 2022-06-22   3.91 0.304 Inf      3.31      4.50  a    
-# Brown 2022-06-22   3.96 0.304 Inf      3.37      4.56  a    
-# Check 2022-06-22   4.01 0.304 Inf      3.42      4.61  a    
-# Gr-Br 2022-06-22   4.13 0.303 Inf      3.53      4.72  a   
+# trt   date       emmean   SE df lower.CL upper.CL .group
+# Green 2022-09-23   35.3 10.4 35     14.3     56.3  a    
+# Check 2022-09-23   38.0 10.4 35     17.0     59.0  a    
+# Brown 2022-09-23   38.8 10.4 35     17.8     59.8  a    
+# Gr-Br 2022-09-23   47.5 10.4 35     26.5     68.5  a    
+# Green 2022-06-22   50.5 10.4 35     29.5     71.5  a    
+# Check 2022-06-22   53.2 10.4 35     32.2     74.2  a    
+# Brown 2022-06-22   54.0 10.4 35     33.0     75.0  a    
+# Gr-Br 2022-06-22   62.7 10.4 35     41.7     83.7  a   
 
 beans_1_plot <- beans_1 %>% 
   group_by(trt, date) %>% 
@@ -478,19 +704,19 @@ ggplot(beans_1_plot, aes(x = trt, y = mean))+
 #2023
 beans_2 <- beans_only %>% 
   filter(year == '2023')
-beans_2_mod <- MASS::glm.nb(total_score ~ trt + date, data = beans_2)
+beans_2_mod <- glm(total_score ~ trt + date, data = beans_2)
 summary(beans_2_mod)
 hist(residuals(beans_2_mod))
 cld(emmeans(beans_2_mod, ~trt+date), Letters = letters)
-# trt   date       emmean    SE  df asymp.LCL asymp.UCL .group
-# Gr-Br 2023-07-18   3.70 0.179 Inf      3.34      4.05  a    
-# Brown 2023-07-18   3.80 0.178 Inf      3.45      4.15  a    
-# Check 2023-07-18   3.87 0.178 Inf      3.53      4.22  a    
-# Green 2023-07-18   3.88 0.178 Inf      3.53      4.23  a    
-# Gr-Br 2023-11-04   3.96 0.178 Inf      3.61      4.30  a    
-# Brown 2023-11-04   4.06 0.178 Inf      3.71      4.41  a    
-# Check 2023-11-04   4.13 0.177 Inf      3.79      4.48  a    
-# Green 2023-11-04   4.14 0.177 Inf      3.79      4.48  a 
+# trt   date       emmean   SE df lower.CL upper.CL .group
+# Gr-Br 2023-07-18   38.6 8.47 35     21.5     55.8  a    
+# Brown 2023-07-18   43.5 8.47 35     26.3     60.6  a    
+# Green 2023-07-18   48.8 8.47 35     31.6     65.9  a    
+# Check 2023-07-18   49.4 8.47 35     32.2     66.5  a    
+# Gr-Br 2023-11-04   52.8 8.47 35     35.6     69.9  a    
+# Brown 2023-11-04   57.5 8.47 35     40.4     74.7  a    
+# Green 2023-11-04   62.9 8.47 35     45.7     80.0  a    
+# Check 2023-11-04   63.5 8.47 35     46.3     80.6  a  
 
 
 # 
@@ -1223,24 +1449,9 @@ ggplot(filter(new_micro_bcc, year == "2023"), aes(x = cc_mean , y = mean_score_y
 
 # micro abundance x cc biomass ####
 
-# corn
-
-micros_set
-colnames(micros_set)
-unique(micros_set$crop)
-corn_micro_totals <- micros_set %>% 
-  relocate(date, crop, plot, trt) %>% 
-  mutate(total_abund = dplyr::select(.,5:43) %>% 
-           rowSums(na.rm = TRUE)) %>% 
-  dplyr::select(date, crop, plot, trt, total_abund) %>% 
-  filter(crop == 'corn') %>% 
-  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
-  mutate(year = format(date, "%Y")) %>% 
-  relocate(year) %>% 
-  dplyr::select(-date) %>% 
-  group_by(year, trt) %>% 
-  summarise(avg_abund = mean(total_abund))
-
+# corn: DF from abundance 
+corn_micro_totals
+cc_mg_clean
 new_total_cc <- cbind(cc_mg_clean, corn_micro_totals)
 new_total_cc <- new_total_cc %>% 
   rename(year = year...1, 
@@ -1283,29 +1494,8 @@ DAP: Days after plant"))+
         panel.grid.minor = element_blank(),
         plot.caption = element_text(hjust = 0, size = 20, color = "grey25"))
 
-# I have also done cc ~ micros. It does not make sense bc there would be an interaction. 
-# this formula does not tell us anything. Stick with micros ~ cc
-
-
-# beans 
-
-micros_set
-colnames(micros_set)
-unique(micros_set$crop)
-bean_micro_totals <- micros_set %>% 
-  relocate(date, crop, plot, trt) %>% 
-  mutate(total_abund = dplyr::select(.,5:43) %>% 
-           rowSums(na.rm = TRUE)) %>% 
-  dplyr::select(date, crop, plot, trt, total_abund) %>% 
-  filter(crop == 'beans') %>% 
-  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
-  mutate(year = format(date, "%Y")) %>% 
-  relocate(year) %>% 
-  dplyr::select(-date) %>% 
-  group_by(year, trt) %>% 
-  summarise(avg_abund = mean(total_abund)) %>% 
-  filter(trt != "Check")
-
+# beans: DF from abundance 
+bean_micro_totals
 bcc_mg_clean
 new_total_bcc <- cbind(bcc_mg_clean, bean_micro_totals)
 new_total_bcc <- new_total_bcc %>% 
