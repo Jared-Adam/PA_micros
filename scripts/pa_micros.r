@@ -19,6 +19,7 @@ library(ggpmisc)
 library(multcomp)
 library(emmeans)
 library(ggrepel)
+library(flextable)
 
 # data ####
 micros <- CE2_counts
@@ -83,6 +84,79 @@ micros_set <- rbind(micro_other, subset_21) %>%
   arrange(crop,date, plot) %>% 
   print(n = Inf)
 
+
+# figure of all groups for the paper
+table <- micros_set %>% 
+  mutate(Acari = Orb + Norb,
+         'Hemi-Eudpahic Collembola' = col_10 + col_6 + sym,
+         'Eudaphic Collembola' = col_4 +ento,
+         'Epigeic Collembola' = col_20 + pod,
+         Diplura = Diplura + japy + camp,
+         Hemiptera = Enich + hemip, 
+         ) %>% 
+  rename(Protura = protura, 
+         Pauropoda = pauropoda, 
+         Thysanoptera = Thrips,
+         Siponoptera = sipoopter,
+         Archaeognatha = archaeognatha,
+         'Coleoptera larvae' = CL,
+         'Other larvae' = OL,
+         'Carabidae' = AC,
+         'Other Coleoptera' = OAC,
+         Diptera = a_dipt,
+         Spider = spider,
+         'Diplopoda < 5mm' = 'Dip<5',
+         'Diplopoda > 5mm' = 'Dip>5',
+         'Chilopoda < 5mm' = 'Chil<5',
+         'Chilopoda > 5mm' = 'Chil>5',
+         Isopoda = Iso,
+         Hymenoptera = hymen,
+         Dermaptera = dermaptera,
+         Lepidoptera = lep
+  ) %>% 
+  dplyr::select(-Orb, -Norb, -col_10, -col_6, -Diplura, -japy, -camp, -Enich, -hemip,
+                -col_20, -col_4, -sym, -pod, -ento)
+
+# how many micros did I id for this?
+table %>% 
+  pivot_longer(
+    cols = where(is.numeric)
+  )  %>% 
+  summarise(total = sum(value)) %>% 
+  print(n = Inf)
+#  3709
+
+# for the paper
+
+paper <- table %>% 
+  pivot_longer(
+    cols = where(is.numeric)
+  ) %>% 
+  group_by(crop, name) %>% 
+  summarise(total = sum(value)) %>% 
+  mutate(crop = case_when(crop == 'corn' ~ "Corn",
+                          crop == 'beans' ~ "Soybean")) %>% 
+  print(n = Inf)
+
+paper <- paper %>% 
+  pivot_wider(names_from = name,
+            values_from = total,
+            values_fn = list(family = length))
+
+
+
+fp <- flextable(paper) %>% 
+  set_header_labels(fo,
+                    values = list(
+                      crop = 'Crop',
+                      name = 'Group',
+                      total = 'Total count'
+                    ))
+fp <- theme_zebra(fp)
+autofit(fp) %>% 
+  save_as_docx(path = 'ce2Totalmicros.docx')
+
+
 # scores ####
 micros_set
 colnames(micros_set)
@@ -93,7 +167,10 @@ aggregate_micros <- micros_set %>%
   mutate(mites = Orb + Norb,
           hemiptera = hemip + Enich + Coccomorpha,
           adult = a_dipt + lep + sipoopter, 
-          coleop_1 = AC + OAC) %>% 
+          coleop_1 = AC + OAC, 
+         col_20 = col_20 + pod,
+         col_10 = col_10 + sym,
+         col_6 = col_6 + ento) %>% 
   dplyr::select(-Orb, -Norb, -hemip, -Enich, -pod, -ento, -sym, -AC, -OAC, 
                 -a_dipt, -Coccomorpha, -lep, -sipoopter) %>% 
   rename(dip_5 = 'Dip>5',
@@ -259,84 +336,40 @@ summary(m1)
 cld(emmeans(m1, ~ date), Letters = letters)
 
 # date       emmean     SE  df asymp.LCL asymp.UCL .group
-# 2022-09-23   3.35 0.0926 Inf      3.17      3.53  a    
-# 2021-09-01   3.58 0.1295 Inf      3.33      3.84  ab   
-# 2023-07-18   3.72 0.0911 Inf      3.54      3.90  ab   
-# 2023-11-04   3.95 0.0904 Inf      3.77      4.13   b   
-# 2022-06-22   3.99 0.0903 Inf      3.82      4.17   b   
-# 2021-07-01   4.07 0.1477 Inf      3.78      4.36   b   
+# 2021-09-01   3.58 0.1316 Inf      3.32      3.84  a    
+# 2023-07-18   3.76 0.0924 Inf      3.58      3.94  ab   
+# 2022-09-23   3.87 0.0921 Inf      3.69      4.05  ab   
+# 2023-11-04   4.01 0.0917 Inf      3.83      4.19  ab   
+# 2022-06-22   4.05 0.0916 Inf      3.87      4.23   b   
+# 2021-07-01   4.07 0.1501 Inf      3.78      4.37  ab
 
 
-
-
-
-# not using this but will leave it here for meow
-# colnames(micro_scores)
-# 
-# #mixed model for avg score x trt? 
-# micro_score_model
-# p <- glmer(total_score ~ trt + 
-#              (1|year/crop),
-#            family = poisson,
-#            data = micro_score_model)
-# nb <- glmer.nb(total_score ~ trt + date +
-#                  (1|year),
-#                data = micro_score_model)
-# 
-# lrtest(p, nb)
-# 
-# hist(residuals(nb))
-# 
-# # model with block = singular. I removed block
-# m0 <- glmer.nb(total_score ~ 
-#                  (1|year/crop), 
-#                data = micro_score_model)
-# m1 <- glmer.nb(total_score ~ trt+
-#                  (1|year/crop), 
-#                data = micro_score_model)
-# m2 <- glmer.nb(total_score ~ trt + date +
-#                  (1|crop), 
-#                data = micro_score_model)
-# # m3 <- glmer.nb(total_score ~ trt*date +
-# #                  (1|year/crop), 
-# #                data = micro_score_model)
-# 
-# anova(m0, m1, m2, m3)
-# hist(residuals(m2))
-# summary(m2)
-# r2_nakagawa(m3)
-# # Conditional R2: 0.411
-# # Marginal R2: 0.411
-# 
-# all_emm <- cld(emmeans(m3, ~trt + date), Letters = letters)
-# # high levels of variation among year and trt
 
 all_aov <- aov(total_score ~ year, data = micro_score_model)
 TukeyHSD(all_aov)
 hist(residuals(all_aov))
 # $year
-# diff       lwr       upr     p adj
-# 2022-2021 -4.203571 -15.64270  7.235559 0.6611223
-# 2023-2021  1.033929 -10.40520 12.473059 0.9751895
-# 2023-2022  5.237500  -3.68719 14.162190 0.3501438
-
+# diff        lwr       upr     p adj
+# 2022-2021  6.971429  -4.798941 18.741799 0.3434406
+# 2023-2021  3.708929  -8.061441 15.479299 0.7374329
+# 2023-2022 -3.262500 -12.445619  5.920619 0.6791686
 corn_aov_df <- filter(micro_score_model, crop == 'corn')
 corn_aov <- aov(total_score ~ year, data = corn_aov_df)
 TukeyHSD(corn_aov)
 hist(residuals(corn_aov))
 # $year
-# diff       lwr      upr     p adj
-# 2022-2021 -0.3785714 -12.74795 11.99081 0.9970907
-# 2023-2021 -1.5035714 -13.87295 10.86581 0.9551049
-# 2023-2022 -1.1250000 -13.07496 10.82496 0.9728177
+# diff        lwr        upr     p adj
+# 2022-2021  12.0714286  -0.368687 24.5115441 0.0592100
+# 2023-2021   0.9464286 -11.493687 13.3865441 0.9821613
+# 2023-2022 -11.1250000 -23.143293  0.8932934 0.0757645
 
 beans_aov_df <- filter(micro_score_model, crop == 'beans')
 beans_aov <- aov(total_score ~ year, data = beans_aov_df)
 TukeyHSD(beans_aov)
 hist(residuals(beans_aov))
 # $year
-# diff       lwr      upr     p adj
-# 2023-2022 11.6 0.1879175 23.01208 0.0464333
+# diff      lwr      upr     p adj
+# 2023-2022  4.6 -7.33291 16.53291 0.4451317
 
 ####
 ###
@@ -367,10 +400,10 @@ corn_2_mod <- MASS::glm.nb(total_score ~ date, data = corn_2)
 summary(corn_2_mod)
 hist(residuals(corn_2_mod))
 corn_2_mod_df <- cld(emmeans(corn_2_mod, ~date), Letters = letters)
-
+# 
 # date       emmean    SE  df asymp.LCL asymp.UCL .group
-# 2022-09-23   3.52 0.139 Inf      3.25      3.79  a    
-# 2022-06-22   4.04 0.136 Inf      3.77      4.30   b   
+# 2022-09-23   4.04 0.131 Inf      3.78      4.29  a    
+# 2022-06-22   4.07 0.131 Inf      3.82      4.33  a    
 
 corn_2_plot <- corn_2 %>% 
   group_by(trt, date) %>% 
@@ -417,14 +450,15 @@ summary(beans_1_mod)
 hist(residuals(beans_1_mod))
 beans_1_mod_df <- cld(emmeans(beans_1_mod, ~trt + date), Letters = letters)
 # trt   date       emmean    SE  df asymp.LCL asymp.UCL .group
-# Green 2022-09-23   3.05 0.297 Inf      2.47      3.64  a    
-# Check 2022-09-23   3.14 0.297 Inf      2.56      3.72  a    
-# Brown 2022-09-23   3.24 0.296 Inf      2.66      3.82  a    
-# Gr-Br 2022-09-23   3.25 0.296 Inf      2.67      3.84  a    
-# Green 2022-06-22   3.81 0.295 Inf      3.23      4.39  a    
-# Check 2022-06-22   3.90 0.295 Inf      3.32      4.47  a    
-# Brown 2022-06-22   4.00 0.294 Inf      3.42      4.58  a    
-# Gr-Br 2022-06-22   4.01 0.294 Inf      3.43      4.59  a 
+# Green 2022-09-23   3.59 0.305 Inf      3.00      4.19  a    
+# Brown 2022-09-23   3.65 0.304 Inf      3.05      4.24  a    
+# Check 2022-09-23   3.70 0.304 Inf      3.10      4.29  a    
+# Gr-Br 2022-09-23   3.81 0.304 Inf      3.22      4.41  a    
+# Green 2022-06-22   3.91 0.304 Inf      3.31      4.50  a    
+# Brown 2022-06-22   3.96 0.304 Inf      3.37      4.56  a    
+# Check 2022-06-22   4.01 0.304 Inf      3.42      4.61  a    
+# Gr-Br 2022-06-22   4.13 0.303 Inf      3.53      4.72  a   
+
 beans_1_plot <- beans_1 %>% 
   group_by(trt, date) %>% 
   summarise(mean = mean(total_score),
@@ -449,14 +483,14 @@ summary(beans_2_mod)
 hist(residuals(beans_2_mod))
 cld(emmeans(beans_2_mod, ~trt+date), Letters = letters)
 # trt   date       emmean    SE  df asymp.LCL asymp.UCL .group
-# Gr-Br 2023-07-18   3.66 0.180 Inf      3.31      4.01  a    
-# Brown 2023-07-18   3.78 0.179 Inf      3.43      4.13  a    
-# Green 2023-07-18   3.80 0.179 Inf      3.45      4.15  a    
-# Check 2023-07-18   3.80 0.179 Inf      3.45      4.16  a    
-# Gr-Br 2023-11-04   3.91 0.179 Inf      3.56      4.26  a    
-# Brown 2023-11-04   4.03 0.179 Inf      3.68      4.38  a    
-# Green 2023-11-04   4.05 0.179 Inf      3.70      4.40  a    
-# Check 2023-11-04   4.05 0.179 Inf      3.70      4.40  a
+# Gr-Br 2023-07-18   3.70 0.179 Inf      3.34      4.05  a    
+# Brown 2023-07-18   3.80 0.178 Inf      3.45      4.15  a    
+# Check 2023-07-18   3.87 0.178 Inf      3.53      4.22  a    
+# Green 2023-07-18   3.88 0.178 Inf      3.53      4.23  a    
+# Gr-Br 2023-11-04   3.96 0.178 Inf      3.61      4.30  a    
+# Brown 2023-11-04   4.06 0.178 Inf      3.71      4.41  a    
+# Check 2023-11-04   4.13 0.177 Inf      3.79      4.48  a    
+# Green 2023-11-04   4.14 0.177 Inf      3.79      4.48  a 
 
 
 # 
@@ -537,8 +571,8 @@ ggplot(corn_1_plot, aes(x = date, y = mean, fill = date))+
   scale_x_discrete(labels = c('1 July 2021', '1 September 2021'))+
   labs(
     title = 'Corn 2021 AVG QBS x Date',
-    x = 'Sampling Date', 
-    y = 'Average QBS Score'
+    x = 'Sampling date', 
+    y = 'Average QBS score'
   )+
   theme(legend.position = 'none',
         axis.text.x = element_text(size=26),
@@ -570,8 +604,8 @@ ggplot(corn_2_plot, aes(x = date, y = mean, fill = date))+
   scale_x_discrete(labels = c('22 June 2022', '23 September 2022'))+
   labs(
     title = 'Corn 2022 AVG QBS x Date',
-    x = 'Sampling Date', 
-    y = 'Average QBS Score'
+    x = 'Sampling date', 
+    y = 'Average QBS score'
   )+
   theme(legend.position = 'none',
         axis.text.x = element_text(size=26),
@@ -597,7 +631,7 @@ ggplot(beans_trt_year_score, aes(x = year, y = avg, fill = year))+
   geom_errorbar(aes(x = year, ymin = avg-se, ymax = avg+se), 
                 position = position_dodge(0.9),
                 width = 0.4, linewidth = 1.3)+
-  scale_fill_brewer(palette = 'Dark2')+
+  scale_fill_manual(values = c("#E7298A", "#7570B3"))+
   labs(title = "Soybean: Overall average QBS Scores x Year",
        subtitle = "Years: 2022-2023",
        x = "Year",
@@ -610,7 +644,9 @@ ggplot(beans_trt_year_score, aes(x = year, y = avg, fill = year))+
         plot.subtitle = element_text(size = 24),
         panel.grid.major.y = element_line(color = "darkgrey"),
         panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank())
+        panel.grid.minor = element_blank())+
+  annotate('text', x = 1, y = 56, label = 'a', size = 10)+
+  annotate('text' , x = 2, y = 56, label = 'b', size = 10)
 
 # both of these are from 2022. What happened that year?
 
@@ -990,18 +1026,19 @@ summary(corn_cc_micro)
 hist(residuals(corn_cc_micro))
 
 
-ggplot(new_micro_cc, aes(x = mean, y = mean_score_yr))+
+
+ggplot(new_micro_cc, aes(x =  mean_score_yr, y =mean))+
   geom_point(aes(color = trt),size = 6)+
   # geom_smooth(method = 'lm', color = "black", size = 1.5) + 
   stat_poly_eq(label.x = "left", label.y = "top", size = 12)+
   scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"),
-                     labels = c("No CC", "14-28 DPP", "1-3 DAP"))+
+                     labels = c("14-28 DPP", "3-7 DPP", "1-3 DAP"))+
   labs(title = "Corn: QBS Scores ~ Average CC Biomass",
        subtitle = "Years: 2021-2023",
-       y = 'Average QBS scores',
+       x = 'Average QBS scores',
        caption = "DPP: Days pre plant
 DAP: Days after plant")+
-  xlab(bquote('Biomass'(Mg/ha^-1)))+
+  ylab(bquote('Biomass'(Mg/ha^-1)))+
   guides(color = guide_legend("Treatment"))+
   # annotate("text", x = 1.8, y = 115, label = "p value < 0.001", size = 12, fontface = 'italic')+
   theme(legend.position = "bottom",
@@ -1017,6 +1054,38 @@ DAP: Days after plant")+
         panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank(),
         plot.caption = element_text(hjust = 0, size = 20, color = "grey25"))
+
+
+
+
+
+# ggplot(new_micro_cc, aes(x = mean, y = mean_score_yr))+
+#   geom_point(aes(color = trt),size = 6)+
+#   # geom_smooth(method = 'lm', color = "black", size = 1.5) + 
+#   stat_poly_eq(label.x = "left", label.y = "top", size = 12)+
+#   scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"),
+#                      labels = c("No CC", "14-28 DPP", "1-3 DAP"))+
+#   labs(title = "Corn: QBS Scores ~ Average CC Biomass",
+#        subtitle = "Years: 2021-2023",
+#        y = 'Average QBS scores',
+#        caption = "DPP: Days pre plant
+# DAP: Days after plant")+
+#   xlab(bquote('Biomass'(Mg/ha^-1)))+
+#   guides(color = guide_legend("Treatment"))+
+#   # annotate("text", x = 1.8, y = 115, label = "p value < 0.001", size = 12, fontface = 'italic')+
+#   theme(legend.position = "bottom",
+#         legend.key.size = unit(.50, 'cm'),
+#         legend.title = element_text(size = 24),
+#         legend.text = element_text(size = 24),
+#         axis.text.x = element_text(size=26),
+#         axis.text.y = element_text(size = 26),
+#         axis.title = element_text(size = 32),
+#         plot.title = element_text(size = 28),
+#         plot.subtitle = element_text(size = 24), 
+#         panel.grid.major.y = element_line(color = "darkgrey"),
+#         panel.grid.major.x = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         plot.caption = element_text(hjust = 0, size = 20, color = "grey25"))
  
 
 # did not look at these on 3/29/2024 or 4/12/2024
@@ -1102,17 +1171,17 @@ summary(bb_score_cc_)
 hist(residuals(bb_score_cc_))
 
 
-ggplot(new_micro_bcc, aes(x = mean, y = mean_score_yr))+
+ggplot(new_micro_bcc, aes(x = mean_score_yr, y = mean))+
   geom_point(aes(color = trt),size = 8)+
   stat_poly_eq(label.x = "left", label.y = "top", size = 12)+
   scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"),
-                     labels = c("No CC", "14-28 DPP", "1-3 DAP"))+
+                     labels = c("14-28 DPP", "3-7 DPP", "1-3 DAP"))+
   labs(title = "Soybean: QBS Scores ~ Average CC Biomass",
        subtitle = "Years: 2022-2023",
-       y = 'Average QBS scores',
+       x = 'Average QBS scores',
        caption = "DPP: Days pre plant
 DAP: Days after plant")+
-  xlab(bquote('Biomass'(Mg/ha^-1)))+
+  ylab(bquote('Biomass'(Mg/ha^-1)))+
   guides(color = guide_legend("Treatment"))+
   theme(legend.position = "bottom",
         legend.key.size = unit(.50, 'cm'),
