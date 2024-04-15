@@ -586,6 +586,7 @@ ggplot(corn_1_plot, aes(x = date, y = mean, fill = date))+
   annotate('text', x = 1, y = 67, label = 'a', size = 10)+
   annotate('text' , x = 2, y = 67, label = 'b', size = 10)
 
+# NOT SIG as of 4/14/2024
 # 2022 corn 
 corn_2_plot <- corn_2 %>% 
   group_by(date) %>% 
@@ -615,16 +616,9 @@ ggplot(corn_2_plot, aes(x = date, y = mean, fill = date))+
         plot.subtitle = element_text(size = 24),
         panel.grid.major.y = element_line(color = "darkgrey"),
         panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank())+
-  annotate('text', x = 1, y = 65, label = 'a', size = 10)+
-  annotate('text' , x = 2, y = 65, label = 'b', size = 10)
+        panel.grid.minor = element_blank())
 
-
-
-
-
-
-
+# NOT SIG as of 4/14/2024
 # beans by year plot 
 ggplot(beans_trt_year_score, aes(x = year, y = avg, fill = year))+
   geom_bar(stat = 'identity', position = "dodge", alpha = 0.7)+
@@ -644,9 +638,7 @@ ggplot(beans_trt_year_score, aes(x = year, y = avg, fill = year))+
         plot.subtitle = element_text(size = 24),
         panel.grid.major.y = element_line(color = "darkgrey"),
         panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank())+
-  annotate('text', x = 1, y = 56, label = 'a', size = 10)+
-  annotate('text' , x = 2, y = 56, label = 'b', size = 10)
+        panel.grid.minor = element_blank())
 
 # both of these are from 2022. What happened that year?
 
