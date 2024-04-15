@@ -347,10 +347,10 @@ cld(emmeans(b1, ~year), Letters = letters)
 
 beans_22_a <- b.abund_model %>% 
   filter(year == '2022')
-b2 <- glm(total_abund ~ trt +date , data = beans_22_a)
+b2 <- glm(total_abund ~ trt + date , data = beans_22_a)
 hist(residuals(b2))
 summary(b2)
-cld(emmeans(b2, ~ trt +date), Letters = letters)
+cld(emmeans(b2, ~ trt + date), Letters = letters)
 # trt   date       emmean   SE df lower.CL upper.CL .group
 # Brown 2022-09-23   7.03 3.41 35    0.103     13.9  a    
 # Check 2022-09-23   9.72 3.41 35    2.803     16.6  a    
@@ -361,24 +361,24 @@ cld(emmeans(b2, ~ trt +date), Letters = letters)
 # Gr-Br 2022-06-22  14.88 3.41 35    7.953     21.8  a    
 # Green 2022-06-22  15.28 3.41 35    8.353     22.2  a 
 
-beans_23_a <- c.abund_model %>% 
+beans_23_a <- b.abund_model %>% 
   filter(year == '2023')
 b3 <- glm(total_abund ~trt + date, data = beans_23_a)
 hist(residuals(b3))
 summary(b3)
 cld(emmeans(b3, ~trt + date), Letters = letters)
 # trt   date       emmean   SE df lower.CL upper.CL .group
-# Gr-Br 2023-07-18   11.0 4.52 35     1.85     20.2  a    
-# Brown 2023-07-18   11.8 4.52 35     2.65     21.0  a    
-# Check 2023-07-18   12.4 4.52 35     3.25     21.6  a    
-# Green 2023-07-18   14.7 4.52 35     5.55     23.9  a    
-# Gr-Br 2023-11-04   15.6 4.52 35     6.40     24.7  a    
-# Brown 2023-11-04   16.4 4.52 35     7.20     25.5  a    
-# Check 2023-11-04   17.0 4.52 35     7.80     26.1  a    
-# Green 2023-11-04   19.3 4.52 35    10.10     28.4  a 
+# Brown 2023-07-18   12.9 6.14 35    0.438     25.4  a    
+# Gr-Br 2023-07-18   14.0 6.14 35    1.538     26.5  a    
+# Check 2023-07-18   18.8 6.14 35    6.338     31.3  a    
+# Brown 2023-11-04   20.1 6.14 35    7.638     32.6  a    
+# Gr-Br 2023-11-04   21.2 6.14 35    8.738     33.7  a    
+# Green 2023-07-18   23.9 6.14 35   11.438     36.4  a    
+# Check 2023-11-04   26.0 6.14 35   13.538     38.5  a    
+# Green 2023-11-04   31.1 6.14 35   18.638     43.6  a 
 
 # abundance plots ####
-abundance_model %>% 
+overall_abundance <- abundance_model %>% 
   group_by(crop, trt) %>% 
   summarise(mean = mean(total_abund), 
             sd = sd(total_abund), 
@@ -386,6 +386,187 @@ abundance_model %>%
             se = sd/sqrt(n)) %>% 
   arrange(crop) %>% 
   print(n = Inf)
+
+ggplot(overall_abundance, aes(x = trt, y = mean, fill = crop))+
+  geom_bar(stat = 'identity', position = "dodge", alpha = 0.7)+
+  scale_fill_manual(values = c( "#1B9E77","#D95F02"),
+                    name = "Crop", labels = c("Soybean", "Corn"))+
+  scale_x_discrete(limits = c("Check", "Brown", "Gr-Br", "Green"),
+                   labels=c('No CC', '14-28 DPP', '3-7 DPP', '1-3 DAP'))+
+  geom_errorbar(aes(x = trt, ymin = mean-se, ymax = mean+se), 
+                position = position_dodge(0.9),
+                width = 0.4, linewidth = 1.3)+
+  labs(title = "Overall Average abundance x Crop and Treatment",
+       subtitle = "Years: Corn, 2021-2023. Beans, 2022-2023",
+       x = "Treatment",
+       y = "Average abundance",
+       caption = "DPP: Days pre plant
+DAP: Days after plant")+
+  theme(legend.position = 'bottom',
+        legend.key.size = unit(.5, 'cm'), 
+        legend.text = element_text(size = 24),
+        legend.title = element_text(size = 24),
+        axis.text.x = element_text(size=26),
+        axis.text.y = element_text(size = 26),
+        axis.title = element_text(size = 32),
+        plot.title = element_text(size = 28),
+        plot.subtitle = element_text(size = 24),
+        panel.grid.major.y = element_line(color = "darkgrey"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.caption = element_text(hjust = 0, size = 26, color = "grey25"))
+
+##
+#
+
+overall_a.cb <- abundance_model %>% 
+  group_by(crop) %>% 
+  summarise(mean = mean(total_abund), 
+            sd = sd(total_abund), 
+            n = n(), 
+            se = sd/sqrt(n)) %>% 
+  arrange(crop) %>% 
+  print(n = Inf)
+
+ggplot(overall_a.cb, aes(x = crop, y = mean, fill = crop))+
+  geom_bar(stat = 'identity', position = "dodge", alpha = 0.7)+
+  scale_fill_manual(values = c( "#1B9E77","#D95F02"),
+                    name = "Crop", labels = c("Soybean", "Corn"))+
+  geom_errorbar(aes(x = crop, ymin = mean-se, ymax = mean+se), 
+                position = position_dodge(0.9),
+                width = 0.4, linewidth = 1.3)+
+  labs(title = "Overall Average abundance x Crop",
+       subtitle = "Years: Corn, 2021-2023. Beans, 2022-2023",
+       x = "Treatment",
+       y = "Average abundance",
+       caption = "DPP: Days pre plant
+DAP: Days after plant")+
+  theme(legend.position = 'bottom',
+        legend.key.size = unit(.5, 'cm'), 
+        legend.text = element_text(size = 24),
+        legend.title = element_text(size = 24),
+        axis.text.x = element_text(size=26),
+        axis.text.y = element_text(size = 26),
+        axis.title = element_text(size = 32),
+        plot.title = element_text(size = 28),
+        plot.subtitle = element_text(size = 24),
+        panel.grid.major.y = element_line(color = "darkgrey"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.caption = element_text(hjust = 0, size = 26, color = "grey25"))+
+  annotate('text', x = 1, y = 24, label = 'a', size = 10)+
+  annotate('text', x = 2, y = 24, label = 'b', size = 10)
+
+corn_abundance <- abundance_model %>% 
+  filter(crop == 'corn') %>% 
+  group_by(crop, year) %>% 
+  summarise(mean = mean(total_abund), 
+            sd = sd(total_abund), 
+            n = n(), 
+            se = sd/sqrt(n)) %>% 
+  arrange(year) %>% 
+  print(n = Inf)
+
+ggplot(corn_abundance, aes(x = year, y = mean, fill = year))+
+  geom_bar(stat = 'identity', position = 'dodge', alpha = 0.7)+
+  geom_errorbar(aes(ymin = mean - se, ymax = mean +se), 
+                position = position_dodge(0.9),
+                width = 0.4, linewidth = 1.3)+
+  scale_fill_brewer(palette = 'Dark2')+
+  labs(
+    title = 'Corn abund x year',
+    x = 'Year', 
+    y = 'Average abundance'
+  )+
+  theme(legend.position = 'none',
+        axis.text.x = element_text(size=26),
+        axis.text.y = element_text(size = 26),
+        axis.title = element_text(size = 32),
+        plot.title = element_text(size = 28),
+        plot.subtitle = element_text(size = 24),
+        panel.grid.major.y = element_line(color = "darkgrey"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank())+
+  annotate('text', x = 1, y = 39, label = 'a', size = 10)+
+  annotate('text' , x = 2, y = 39, label = 'b', size = 10)+
+  annotate('text' , x = 3, y = 39, label = 'a', size = 10)
+##
+#
+
+bean_abundance <- abundance_model %>% 
+  filter(crop == 'beans') %>% 
+  group_by(crop, year) %>% 
+  summarise(mean = mean(total_abund), 
+            sd = sd(total_abund), 
+            n = n(), 
+            se = sd/sqrt(n)) %>% 
+  arrange(year) %>% 
+  print(n = Inf)
+
+ggplot(bean_abundance, aes(x = year, y = mean, fill = year))+
+  geom_bar(stat = 'identity', position = 'dodge', alpha = 0.7)+
+  geom_errorbar(aes(ymin = mean - se, ymax = mean +se), 
+                position = position_dodge(0.9),
+                width = 0.4, linewidth = 1.3)+
+  scale_fill_brewer(palette = 'Dark2')+
+  labs(
+    title = 'bean abund x year',
+    x = 'Year', 
+    y = 'Average abundance'
+  )+
+  theme(legend.position = 'none',
+        axis.text.x = element_text(size=26),
+        axis.text.y = element_text(size = 26),
+        axis.title = element_text(size = 32),
+        plot.title = element_text(size = 28),
+        plot.subtitle = element_text(size = 24),
+        panel.grid.major.y = element_line(color = "darkgrey"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank())+
+  annotate('text', x = 1, y = 25, label = 'a', size = 10)+
+  annotate('text' , x = 2, y = 25, label = 'b', size = 10)
+
+
+# abundance legacy ####
+
+
+legacy_abund_1 <- rbind(corn_21_a, corn_22_a, beans_22_a, beans_23_a) %>% 
+  mutate(exp = case_when(year == '2021' & crop == 'corn' ~ 1,
+                         year == '2022' & crop == 'beans' ~ 1,
+                         year == '2022' & crop == 'corn' ~ 2,
+                         year == '2023' & crop == 'beans' ~ 2),
+         exp = as.factor(exp)) %>%
+  mutate(block = case_when(plot %in% c('101', '102', '103', '104') ~ 1,
+                           plot %in% c('201', '202', '203', '204') ~ 2,
+                           plot %in% c('301', '302', '303', '304') ~ 3,
+                           plot %in% c('401', '402', '403', '404') ~ 4,
+                           plot %in% c('501', '502', '503', '504') ~5),
+         block = as.factor(block)) %>% 
+  print(n = Inf)
+
+# models with random effects of plot and/ or block are singular
+l0 <- glm(total_abund ~ 0,
+      data = legacy_abund_1)
+
+l1 <- glm(total_abund ~ crop, 
+          data = legacy_abund_1)
+
+l2 <- glm(total_abund ~ crop + exp, 
+          data = legacy_abund_1)
+
+l3 <- glm(total_abund ~ crop*exp,
+          data = legacy_abund_1)
+
+anova(l0,l1,l2,l3)
+
+summary(l3)
+hist(residuals(l3))
+cld(emmeans(l3, ~crop*exp), Letters= letters)
+# crop  exp emmean  SE  df lower.CL upper.CL .group
+# beans 1     11.7 2.9 156     5.99     17.5  a    
+# corn  1     15.2 2.9 156     9.48     21.0  a    
+# beans 2     21.0 2.9 156    15.27     26.7  a    
+# corn  2     32.7 2.9 156    26.97     38.4   b 
 
 
 # scores ####
@@ -571,12 +752,12 @@ summary(m1)
 cld(emmeans(m1, ~ date), Letters = letters)
 
 # date       emmean   SE  df lower.CL upper.CL .group
-# 2021-09-01   36.2 5.32 186     25.7     46.7  a    
-# 2023-07-18   43.1 3.76 186     35.7     50.6  ab   
-# 2022-09-23   48.3 3.76 186     40.9     55.7  ab   
-# 2023-11-04   55.5 3.76 186     48.1     62.9   b   
-# 2022-06-22   56.9 3.76 186     49.5     64.3   b   
-# 2021-07-01   58.9 6.16 186     46.7     71.0  ab 
+# 2021-09-01   36.2 5.58 191     25.2     47.2  a    
+# 2023-07-18   43.1 3.94 191     35.4     50.9  ab   
+# 2021-07-01   43.6 5.58 191     32.6     54.7  ab   
+# 2022-09-23   48.3 3.94 191     40.5     56.1  ab   
+# 2023-11-04   55.5 3.94 191     47.7     63.3  ab   
+# 2022-06-22   56.9 3.94 191     49.1     64.7   b  
 
 
 corn_df <- filter(micro_score_model, crop == 'corn')
@@ -616,8 +797,8 @@ summary(corn_1_mod)
 hist(residuals(corn_1_mod))
 corn_1_mode_df <- cld(emmeans(corn_1_mod, ~date), Letters = letters)
 # date       emmean   SE df lower.CL upper.CL .group
-# 2021-09-01   36.2 4.32 33     27.4     45.0  a    
-# 2021-07-01   58.2 4.98 33     48.1     68.3   b   
+# 2021-09-01   36.2 5.74 38     24.6     47.8  a    
+# 2021-07-01   43.6 5.74 38     32.0     55.3  a  
 
 #2022
 corn_2 <- corn_only %>% 
@@ -779,7 +960,7 @@ ggplot(corn_trt_year_score, aes(x = year, y = avg, fill = year))+
         panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank())
 
-
+# NOT SIG as of 4/15/2024
 # 2021 corn
 corn_1_plot <- corn_1 %>% 
   group_by(date) %>% 
@@ -808,9 +989,7 @@ ggplot(corn_1_plot, aes(x = date, y = mean, fill = date))+
         plot.subtitle = element_text(size = 24),
         panel.grid.major.y = element_line(color = "darkgrey"),
         panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank())+
-  annotate('text', x = 1, y = 67, label = 'a', size = 10)+
-  annotate('text' , x = 2, y = 67, label = 'b', size = 10)
+        panel.grid.minor = element_blank())
 
 # NOT SIG as of 4/14/2024
 # 2022 corn 
@@ -1074,6 +1253,50 @@ ggplot(filter(micros_23, crop == "corn"), aes(x = trt, y = avg, fill = trt))+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())##
 ###
+
+# score legacy ####
+
+legacy_score_1 <- rbind(corn_1, corn_2, beans_1, beans_2) %>% 
+  dplyr::select(date, crop, plot, trt, block, year, total_score) %>% 
+  mutate(exp = case_when(year == '2021' & crop == 'corn' ~ 1,
+                         year == '2022' & crop == 'beans' ~ 1,
+                         year == '2022' & crop == 'corn' ~ 2,
+                         year == '2023' & crop == 'beans' ~ 2),
+         exp = as.factor(exp)) %>%
+  mutate(block = case_when(plot %in% c('101', '102', '103', '104') ~ 1,
+                           plot %in% c('201', '202', '203', '204') ~ 2,
+                           plot %in% c('301', '302', '303', '304') ~ 3,
+                           plot %in% c('401', '402', '403', '404') ~ 4,
+                           plot %in% c('501', '502', '503', '504') ~5),
+         block = as.factor(block)) %>% 
+  print(n = Inf)
+
+s0 <- glmer(total_score ~ (1|exp/plot),
+            data = legacy_score_1)
+
+s1 <- glmer(total_score ~ crop + (1|exp/plot),
+            data = legacy_score_1)
+
+s2 <- glmer(total_score ~ crop + exp + (1|exp/plot),
+            data = legacy_score_1)
+
+s3 <- glmer(total_score ~ crop*exp + (1|exp/plot),
+              data = legacy_score_1)
+
+
+anova(s0,s1,s2,s3)
+# npar    AIC    BIC  logLik deviance  Chisq      Df  Pr(>Chisq) 
+# s2    6 1503.7 1522.1 -745.85   1491.7 4.5857  1    0.03224 *
+
+summary(s3)
+hist(residuals(s3))
+
+cld(emmeans(s3, ~ crop + exp), Letters= letters)
+# crop  exp emmean  SE   df lower.CL upper.CL .group
+# corn  1     39.9 7.6 1285     25.0     54.8  a    
+# beans 1     47.5 7.6 1285     32.6     62.4  a    
+# beans 2     52.1 7.6 1285     37.2     67.0  a    
+# corn  2     57.7 7.6 1285     42.8     72.6  a 
 
 # corn cc biomass time ####
 
@@ -1882,11 +2105,11 @@ colnames(perm_micros)
 
 
 test <- perm_micros %>% 
-  mutate(colembola = col_20 + col_10 + col_6 + col_4,
-         Insects = Enich + hemip + AC + CL + AC + OAC + Psocodea+ Thrips+ sipoopter+hymen+ archaeognatha
+  mutate(Collembola = col_20 + col_10 + col_6 + col_4,
+         Insect = Enich + hemip + AC + CL + AC + OAC + Psocodea+ Thrips+ sipoopter+hymen+ archaeognatha
          + dermaptera + lep+ Formicid + Coccomorpha+a_dipt + OL,
-         mites = Orb + Norb,
-         non_insect = spider + Pseu + Annelid+ protura + simphyla+pauropoda +Diplura +`Chil>5` + `Chil<5`+`Dip>5` + `Dip<5`) %>% 
+         Acari = Orb + Norb,
+         'Non-insect' = spider + Pseu + Annelid+ protura + simphyla+pauropoda +Diplura +`Chil>5` + `Chil<5`+`Dip>5` + `Dip<5`) %>% 
   dplyr::select(-japy, - camp, -`Dip>5`, -`Dip<5`, -`Chil>5`, -`Chil<5`,
                 -col_20, -col_10, -col_6, -col_4, -Enich, -hemip, -sym, -pod, -ento, -Iso) %>% 
   dplyr::select(-Orb, -Norb, -spider, -Pseu, -CL, -OL, -OAC, -a_dipt, -AC, - Coccomorpha, -Psocodea, -Thrips, -simphyla, 
@@ -1900,7 +2123,7 @@ test <- perm_micros %>%
 
 test_new <- test %>% 
   rowwise() %>% 
-  filter(sum(c(colembola, Insects, mites, non_insect)) != 0)
+  filter(sum(c(Collembola, Insect, Acari, `Non-insect`)) != 0)
 test_pops <- test_new[6:9]
 
 huh <- vegdist(test_pops, method = 'bray')
@@ -1916,6 +2139,7 @@ perm_3
 nmds0 <- metaMDS(test_pops, k = 2)
 stressplot(nmds0)
 nmds0$stress
+# 0.1524051
 
 scores <- scores(nmds0, display = 'sites')
 scrs <- cbind(as.data.frame(scores), date = test_new$date)
@@ -1956,23 +2180,44 @@ p1_pc1_pb2
 
 nmds1 <- metaMDS(pc1_pb1_pops, k = 2)
 stressplot(nmds1)
-nmds0$stress
+nmds1$stress
 # 0.1524051
 
 scores <- scores(nmds1, display = 'sites')
-scrs_2122 <- cbind(as.data.frame(scores), date = pc1_pb1$date)
+scrs_2122 <- cbind(as.data.frame(scores), crop = pc1_pb1$crop)
 
 functional_scores1 <- as.data.frame(scores(nmds1, 'species'))
 functional_scores1$species <- rownames(functional_scores1)
 
 ggplot(data = scrs_2122, aes(x = NMDS1, y = NMDS2))+
-  geom_point(aes(color = date))+
-  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)+
+  geom_point(aes(size = 10, color = crop))+
+  scale_color_brewer( palette = 'Dark2')+
+  scale_fill_brewer('Crop',palette = 'Dark2', labels = c('Soybean', 'Corn'))+
+  stat_ellipse(geom = 'polygon', aes(group = crop, color = crop, fill = crop), alpha = 0.3)+
   geom_segment(data = functional_scores1, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
-               arrow = arrow(), color = 'grey10', lwd = 0.7)+
+               arrow = arrow(), color = 'grey10', lwd = 1)+
   geom_text_repel(data = functional_scores1, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
-                  segment.size = 0.25)
-
+                  segment.size = 0.25)+
+annotate("label", x = -.5, y=1.5, label ="Stress = 0.15, k = 2", size = 10)+
+  coord_equal()+
+  theme_bw()+
+  labs(title = "NMDS Legacy 21-22")+
+  theme(axis.text.x = element_blank(),  # remove x-axis text
+        axis.text.y = element_blank(), # remove y-axis text
+        axis.ticks = element_blank(),  # remove axis ticks
+        axis.title.x = element_blank(), # remove x-axis labels
+        axis.title.y = element_blank(), # remove y-axis labels
+        panel.background = element_blank(), 
+        panel.grid.major = element_blank(),  #remove major-grid labels
+        panel.grid.minor = element_blank(),  #remove minor-grid labels
+        plot.background = element_blank(),
+        plot.title = element_text(size = 28),
+        legend.position = 'bottom',
+        legend.title = element_text(size = 24),
+        legend.text = element_text(size = 24),
+        legend.key.size = unit(1.5, 'cm')
+  )+
+  guides(size = 'none', color = 'none', fill = guide_legend(override.aes = list(size = 10)))
 
 # 2022 - 2023
 pc <- test_new %>% 
@@ -1997,23 +2242,43 @@ p1_cb
 
 nmds2 <- metaMDS(pc_pb_pops, k = 2)
 stressplot(nmds2)
-nmds0$stress
-# 0.1524051
+nmds2$stress
+# 0.1245803
 
 scores <- scores(nmds2, display = 'sites')
-scrs_2223 <- cbind(as.data.frame(scores), date = pc_pb$date)
+scrs_2223 <- cbind(as.data.frame(scores), crop = pc_pb$crop)
 
 functional_scores2 <- as.data.frame(scores(nmds2, 'species'))
 functional_scores2$species <- rownames(functional_scores2)
 
 ggplot(data = scrs_2223, aes(x = NMDS1, y = NMDS2))+
-  geom_point(aes(color = date))+
-  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)+
+  geom_point(aes(color = crop))+
+  scale_color_brewer( palette = 'Dark2')+
+  scale_fill_brewer('Crop',palette = 'Dark2', labels = c('Soybean', 'Corn'))+
+  stat_ellipse(geom = 'polygon', aes(group = crop, color = crop, fill = crop), alpha = 0.3)+
   geom_segment(data = functional_scores2, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
-               arrow = arrow(), color = 'grey10', lwd = 0.7)+
+               arrow = arrow(), color = 'grey10', lwd = 1)+
   geom_text_repel(data = functional_scores2, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
-                  segment.size = 0.25)
-
+                  segment.size = 0.25)+
+  annotate("label", x = -.5, y=1.2, label ="Stress = 0.13, k = 2", size = 10)+
+  coord_equal()+
+  theme_bw()+
+  labs(title = "NMDS Legacy 22-23")+
+  theme(axis.text.x = element_blank(),  # remove x-axis text
+        axis.text.y = element_blank(), # remove y-axis text
+        axis.ticks = element_blank(),  # remove axis ticks
+        axis.title.x = element_blank(), # remove x-axis labels
+        axis.title.y = element_blank(), # remove y-axis labels
+        panel.background = element_blank(), 
+        panel.grid.major = element_blank(),  #remove major-grid labels
+        panel.grid.minor = element_blank(),  #remove minor-grid labels
+        plot.background = element_blank(),
+        plot.title = element_text(size = 28),
+        legend.position = 'bottom',
+        legend.title = element_text(size = 24),
+        legend.text = element_text(size = 24),
+        legend.key.size = unit(1.5, 'cm'))+
+  guides(size = 'none', color = 'none', fill = guide_legend(override.aes = list(size = 10)))
 
 # 4/12/2024: not using this anymore, this made the df too small
 # permed_micros <- perm_micros %>% 
