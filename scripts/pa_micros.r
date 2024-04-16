@@ -2191,7 +2191,7 @@ functional_scores1 <- as.data.frame(scores(nmds1, 'species'))
 functional_scores1$species <- rownames(functional_scores1)
 
 ggplot(data = scrs_2122, aes(x = NMDS1, y = NMDS2))+
-  geom_point(aes(size = 10, color = crop))+
+  geom_point(aes( color = crop))+
   scale_color_brewer( palette = 'Dark2')+
   scale_fill_brewer('Crop',palette = 'Dark2', labels = c('Soybean', 'Corn'))+
   stat_ellipse(geom = 'polygon', aes(group = crop, color = crop, fill = crop), alpha = 0.3)+
@@ -2330,11 +2330,6 @@ ggplot(data = scrs_2223, aes(x = NMDS1, y = NMDS2))+
 
 
 
-# comparing populations of the legacy years
-# 2021- 2022
-# can i do this? The collection methods changed a bit 
-# more samples in 2021?
-
 # nmds ####
 # all data 
 
@@ -2377,9 +2372,6 @@ plot <- plot_ly(year_scores, x = ~NMDS1, y = ~ NMDS2, z = ~NMDS3, color = ~year)
 plot <- plot %>% 
   add_markers()
 plot
-
-
-# total population plots ####
 
 
 # trouble shooting code ####
