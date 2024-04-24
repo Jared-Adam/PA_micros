@@ -1472,12 +1472,10 @@ ggplot(new_micro_cc, aes(x =  mean_score_yr, y =mean))+
   # geom_smooth(method = 'lm', color = "black", size = 1.5) + 
   stat_poly_eq(label.x = "left", label.y = "top", size = 12)+
   scale_color_manual(values = c("#D95F02", "#7570B3", "#1B9E77"),
-                     labels = c("14-28 DPP", "3-7 DPP", "1-3 DAP"))+
+                     labels = c("Early terminated", "Late terminated", "Planting green"))+
   labs(title = "Corn: QBS Scores ~ Average CC Biomass",
        subtitle = "Years: 2021-2023",
-       x = 'Average QBS scores',
-       caption = "DPP: Days pre plant
-DAP: Days after plant")+
+       x = 'Average QBS scores')+
   ylab(bquote('Biomass'(Mg/ha^-1)))+
   guides(color = guide_legend("Treatment"))+
   # annotate("text", x = 1.8, y = 115, label = "p value < 0.001", size = 12, fontface = 'italic')+
