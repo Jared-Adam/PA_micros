@@ -84,7 +84,7 @@ micro_other <- micros_set %>%
   filter(date != '7/1/2021', date != '9/1/2021')
 unique(micro_other$date)
 
-# brining back the og name from above 
+# bringing back the og name from above 
 micros_set <- rbind(micro_other, subset_21) %>% 
   arrange(crop,date, plot) %>% 
   print(n = Inf)
@@ -438,10 +438,8 @@ ggplot(overall_a.cb, aes(x = crop, y = mean, fill = crop))+
                 width = 0.4, linewidth = 1.3)+
   labs(title = "Overall Average abundance x Crop",
        subtitle = "Years: Corn, 2021-2023. Beans, 2022-2023",
-       x = "Treatment",
-       y = "Average abundance",
-       caption = "DPP: Days pre plant
-DAP: Days after plant")+
+       x = "Crop",
+       y = "Average abundance")+
   theme(legend.position = 'bottom',
         legend.key.size = unit(.5, 'cm'), 
         legend.text = element_text(size = 24),
@@ -2144,18 +2142,46 @@ nmds0$stress
 
 scores <- scores(nmds0, display = 'sites')
 scrs <- cbind(as.data.frame(scores), date = test_new$date)
+scrs <- cbind(as.data.frame(scrs), crop = test_new$crop)
+
 
 functional_scores <- as.data.frame(scores(nmds0, 'species'))
 functional_scores$species <- rownames(functional_scores)
 
 
 ggplot(data = scrs, aes(x = NMDS1, y = NMDS2))+
-  geom_point(aes(color = date))+
+  geom_point(aes(color = crop, shape = crop), size = 3)+
+  scale_shape_discrete(labels = c('Soybean', 'Corn'))+
+  scale_fill_brewer(palette = 'Dark2', labels = c('1 July 2021', '1 September 2021', '22 June 2022', '23 September 2022',
+                                 '18 July 2023', '4 November 2023'))+
+  scale_color_brewer(date, palette = 'Dark2')+
   stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)+
-  geom_segment(data = functional_scores, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
-               arrow = arrow(), color = 'grey10', lwd = 0.7)+
-  geom_text_repel(data = functional_scores, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
-                  segment.size = 0.25)
+  # geom_segment(data = functional_scores, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
+  #              arrow = arrow(), color = 'grey10', lwd = 0.7)+
+  # geom_text_repel(data = functional_scores, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
+  #                 segment.size = 0.25)+
+  annotate("label", x = -.5, y=1.5, label ="Stress = 0.15, k = 2", size = 10)+
+  coord_equal()+
+  theme_bw()+
+  labs(title = "NMDS by date x crop", 
+       shape = 'Crop',
+       fill = 'Sampling date')+
+  theme(axis.text.x = element_blank(),  # remove x-axis text
+        axis.text.y = element_blank(), # remove y-axis text
+        axis.ticks = element_blank(),  # remove axis ticks
+        axis.title.x = element_blank(), # remove x-axis labels
+        axis.title.y = element_blank(), # remove y-axis labels
+        panel.background = element_blank(), 
+        panel.grid.major = element_blank(),  #remove major-grid labels
+        panel.grid.minor = element_blank(),  #remove minor-grid labels
+        plot.background = element_blank(),
+        plot.title = element_text(size = 28),
+        legend.position = 'right',
+        legend.title = element_text(size = 24),
+        legend.text = element_text(size = 24),
+        legend.key.size = unit(1.5, 'cm')
+  )+
+  guides(size = 'none', color = 'none', fill = guide_legend(override.aes = list(size = 10)))
 
 
 # 2021 - 2022
@@ -2185,24 +2211,28 @@ nmds1$stress
 # 0.1524051
 
 scores <- scores(nmds1, display = 'sites')
-scrs_2122 <- cbind(as.data.frame(scores), crop = pc1_pb1$crop)
+scrs_2122 <- cbind(as.data.frame(scores), date = pc1_pb1$date)
+scrs_2122 <- cbind(as.data.frame(scrs_2122), crop = pc1_pb1$crop)
 
 functional_scores1 <- as.data.frame(scores(nmds1, 'species'))
 functional_scores1$species <- rownames(functional_scores1)
 
 ggplot(data = scrs_2122, aes(x = NMDS1, y = NMDS2))+
-  geom_point(aes( color = crop))+
+  geom_point(aes(color = crop, shape = crop), size =3)+
+  scale_shape_discrete(labels = c('Soybean', 'Corn'))+
   scale_color_brewer( palette = 'Dark2')+
-  scale_fill_brewer('Crop',palette = 'Dark2', labels = c('Soybean', 'Corn'))+
-  stat_ellipse(geom = 'polygon', aes(group = crop, color = crop, fill = crop), alpha = 0.3)+
-  geom_segment(data = functional_scores1, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
-               arrow = arrow(), color = 'grey10', lwd = 1)+
-  geom_text_repel(data = functional_scores1, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
-                  segment.size = 0.25)+
+  scale_fill_brewer(palette = 'Dark2', labels = c('1 July 2021', '1 September 2021', '22 June 2022', '23 September 2022'))+
+  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)+
+  # geom_segment(data = functional_scores1, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
+  #              arrow = arrow(), color = 'grey10', lwd = 1)+
+  # geom_text_repel(data = functional_scores1, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
+  #                 segment.size = 0.25)+
 annotate("label", x = -.5, y=1.5, label ="Stress = 0.15, k = 2", size = 10)+
   coord_equal()+
   theme_bw()+
-  labs(title = "NMDS Legacy 21-22")+
+  labs(title = "NMDS Legacy 21-22",
+       shape = 'Crop',
+       fill = 'Sampling date')+
   theme(axis.text.x = element_blank(),  # remove x-axis text
         axis.text.y = element_blank(), # remove y-axis text
         axis.ticks = element_blank(),  # remove axis ticks
@@ -2213,7 +2243,7 @@ annotate("label", x = -.5, y=1.5, label ="Stress = 0.15, k = 2", size = 10)+
         panel.grid.minor = element_blank(),  #remove minor-grid labels
         plot.background = element_blank(),
         plot.title = element_text(size = 28),
-        legend.position = 'bottom',
+        legend.position = 'right',
         legend.title = element_text(size = 24),
         legend.text = element_text(size = 24),
         legend.key.size = unit(1.5, 'cm')
@@ -2247,24 +2277,30 @@ nmds2$stress
 # 0.1245803
 
 scores <- scores(nmds2, display = 'sites')
-scrs_2223 <- cbind(as.data.frame(scores), crop = pc_pb$crop)
+scrs_2223 <- cbind(as.data.frame(scores), date = pc_pb$date)
+scrs_2223 <- cbind(as.data.frame(scrs_2223), crop = pc_pb$crop)
 
 functional_scores2 <- as.data.frame(scores(nmds2, 'species'))
 functional_scores2$species <- rownames(functional_scores2)
 
 ggplot(data = scrs_2223, aes(x = NMDS1, y = NMDS2))+
-  geom_point(aes(color = crop))+
+  geom_point(aes(color = crop, shape = crop), size =3)+
+  scale_shape_discrete(labels = c('Soybean', 'Corn'))+
   scale_color_brewer( palette = 'Dark2')+
-  scale_fill_brewer('Crop',palette = 'Dark2', labels = c('Soybean', 'Corn'))+
-  stat_ellipse(geom = 'polygon', aes(group = crop, color = crop, fill = crop), alpha = 0.3)+
-  geom_segment(data = functional_scores2, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
-               arrow = arrow(), color = 'grey10', lwd = 1)+
-  geom_text_repel(data = functional_scores2, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
-                  segment.size = 0.25)+
+  scale_fill_brewer(palette = 'Dark2', labels = c('22 June 2022', '23 September 2022',
+                                                  '18 July 2023', '4 November 2023'))+
+  stat_ellipse(geom = 'polygon', aes(group = date, color = date, fill = date), alpha = 0.3)+
+  # geom_segment(data = functional_scores2, aes( x = 0, xend = NMDS1, y = 0, yend = NMDS2),
+  #              arrow = arrow(), color = 'grey10', lwd = 1)+
+  # geom_text_repel(data = functional_scores2, aes(x = NMDS1, y = NMDS2, label = species), cex = 8, direction = 'both',
+  #                 segment.size = 0.25)+
   annotate("label", x = -.5, y=1.2, label ="Stress = 0.13, k = 2", size = 10)+
   coord_equal()+
   theme_bw()+
-  labs(title = "NMDS Legacy 22-23")+
+  labs(title = "NMDS Legacy 22-23",
+       fill = 'Sampling date',
+       shape = 'Crop',
+       )+
   theme(axis.text.x = element_blank(),  # remove x-axis text
         axis.text.y = element_blank(), # remove y-axis text
         axis.ticks = element_blank(),  # remove axis ticks
@@ -2275,11 +2311,11 @@ ggplot(data = scrs_2223, aes(x = NMDS1, y = NMDS2))+
         panel.grid.minor = element_blank(),  #remove minor-grid labels
         plot.background = element_blank(),
         plot.title = element_text(size = 28),
-        legend.position = 'bottom',
+        legend.position = 'right',
         legend.title = element_text(size = 24),
         legend.text = element_text(size = 24),
         legend.key.size = unit(1.5, 'cm'))+
-  guides(size = 'none', color = 'none', fill = guide_legend(override.aes = list(size = 10)))
+  guides(size = 'none', color = 'none', fill = guide_legend(order = 1), fill = guide_legend(override.aes = list(size = 10)))
 
 # 4/12/2024: not using this anymore, this made the df too small
 # permed_micros <- perm_micros %>% 
