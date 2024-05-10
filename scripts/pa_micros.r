@@ -688,6 +688,26 @@ overall_fig <- micro_scores %>%
                    se = sd/sqrt(n())) %>% 
   print(n = Inf)
 
+#overall average by crop
+micro_scores %>%
+  relocate(date, crop, plot, trt) %>% 
+  mutate(total_score = dplyr::select(.,5:33) %>% 
+           rowSums(na.rm = TRUE)) %>% 
+  mutate(block = case_when(plot %in% c(101,102,103,104) ~ 1,
+                           plot %in% c(201,202,203,204) ~ 2, 
+                           plot %in% c(301,302,303,304) ~ 3, 
+                           plot %in% c(401,402,403,404) ~ 4,
+                           plot %in% c(501,502,503,504) ~ 5)) %>% 
+  relocate(date, crop, plot, trt, block) %>% 
+  mutate(block = as.factor(block)) %>% 
+  dplyr::group_by( crop) %>% 
+  dplyr::summarise(avg = mean(total_score), 
+                   sd = sd(total_score),
+                   se = sd/sqrt(n())) %>% 
+  print(n = Inf)
+  
+
+
 # table of this for the paper
 overall <- flextable(overall_fig)
 overall <- theme_zebra(overall)
@@ -906,6 +926,56 @@ cld(emmeans(beans_2_mod, ~trt+date), Letters = letters)
 
 
 # score plots ####
+
+ggplot(micro_score_model, aes(x=trt, y=total_score, fill = trt))+
+  geom_boxplot(alpha = 0.7)+
+  geom_point()+
+  facet_grid(~factor(crop, levels=c('corn','beans'), labels = c('Corn', 'Soybeans')))+
+  scale_x_discrete(limits = c('Check','Brown','Gr-Br', 'Green'),
+                   labels = c('No CC', 'Early', 'Late', 'Green'))+
+  scale_fill_manual(values = c("#E7298A", "#D95F02" ,"#7570B3", "#1B9E77"))+
+  labs(title = 'Micro scores w line',
+       x = ' Treatment termination', 
+       y = 'QBS-ar scores / treatment')+
+  theme(legend.position = 'none',
+        axis.text.x = element_text(size=26),
+        axis.text.y = element_text(size = 26),
+        axis.title = element_text(size = 32),
+        plot.title = element_text(size = 28),
+        strip.text = element_text(size = 32),
+        plot.subtitle = element_text(size = 24),
+        panel.grid.major.y = element_line(color = "darkgrey"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.caption = element_text(hjust = 0, size = 26, color = "grey25"))+
+  ylim(NA,120)+
+  scale_y_continuous(breaks = c(0,30,60,93.7))+
+  annotate('segment', x = 0, xend = 5, y = 93.7, yend = 93.7, linewidth = 1.5, color = 'red')
+
+ggplot(micro_score_model, aes(x=trt, y=total_score, fill = trt))+
+  geom_boxplot(alpha = 0.7)+
+  geom_point()+
+  facet_grid(~factor(crop, levels=c('corn','beans'), labels = c('Corn', 'Soybeans')))+
+  scale_x_discrete(limits = c('Check','Brown','Gr-Br', 'Green'),
+                   labels = c('No CC', 'Early', 'Late', 'Green'))+
+  scale_fill_manual(values = c("#E7298A", "#D95F02" ,"#7570B3", "#1B9E77"))+
+  labs(title = 'Micro scores no line',
+       x = ' Treatment termination', 
+       y = 'QBS-ar scores / treatment')+
+  theme(legend.position = 'none',
+        axis.text.x = element_text(size=26),
+        axis.text.y = element_text(size = 26),
+        axis.title = element_text(size = 32),
+        plot.title = element_text(size = 28),
+        strip.text = element_text(size = 32),
+        plot.subtitle = element_text(size = 24),
+        panel.grid.major.y = element_line(color = "darkgrey"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.caption = element_text(hjust = 0, size = 26, color = "grey25"))+
+  ylim(NA,120)+
+  scale_y_continuous(breaks = c(0,30,60,90))
+
 
 ggplot(overall_fig, aes(x = trt, y = avg, fill = crop))+
   geom_bar(stat = 'identity', position = "dodge", alpha = 0.7)+
