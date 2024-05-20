@@ -933,7 +933,7 @@ ggplot(micro_score_model, aes(x=trt, y=total_score, fill = trt))+
   facet_grid(~factor(crop, levels=c('corn','beans'), labels = c('Corn', 'Soybeans')))+
   scale_x_discrete(limits = c('Check','Brown','Gr-Br', 'Green'),
                    labels = c('No CC', 'Early', 'Late', 'Green'))+
-  scale_fill_manual(values = c("#E7298A", "#D95F02" ,"#7570B3", "#1B9E77"))+
+  scale_fill_manual(values = c("#D95F02" ,"#E7298A","#7570B3", "#1B9E77"))+
   labs(title = 'Micro scores w line',
        x = ' Treatment termination', 
        y = 'QBS-ar scores / treatment')+
@@ -958,7 +958,7 @@ ggplot(micro_score_model, aes(x=trt, y=total_score, fill = trt))+
   facet_grid(~factor(crop, levels=c('corn','beans'), labels = c('Corn', 'Soybeans')))+
   scale_x_discrete(limits = c('Check','Brown','Gr-Br', 'Green'),
                    labels = c('No CC', 'Early', 'Late', 'Green'))+
-  scale_fill_manual(values = c("#E7298A", "#D95F02" ,"#7570B3", "#1B9E77"))+
+  scale_fill_manual(values = c( "#D95F02" ,"#E7298A","#7570B3", "#1B9E77"))+
   labs(title = 'Micro scores no line',
        x = ' Treatment termination', 
        y = 'QBS-ar scores / treatment')+
